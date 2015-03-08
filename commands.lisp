@@ -507,4 +507,8 @@ If no such form is found, then return the CL-USER package."
       (move-sexp buffer -1)
       (when (string= (symbol-at-point buffer) symbol)
           (return)))))
-      
+
+(defun execute-extended-command ()
+  (let ((command (concatenate 'string "(me::" (read-from-minibuffer "M-x ") "-command)")))
+    (format t "Executing extended command: ~A~%" command)
+    (eval (read-from-string command))))
