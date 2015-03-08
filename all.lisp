@@ -1,3 +1,5 @@
+(delete-package :me)
+
 (sys.int::cal "home/me/package.lisp")
 (sys.int::cal "home/me/line.lisp")
 (sys.int::cal "home/me/mark.lisp")
@@ -7,4 +9,5 @@
 (sys.int::cal "home/me/minibuffer.lisp")
 (sys.int::cal "home/me/redisplay.lisp")
 (sys.int::cal "home/me/commands.lisp")
+(sys.int::cal "home/me/keybindings.lisp")
 (sys.int::cal "home/me/main.lisp")
