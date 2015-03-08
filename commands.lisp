@@ -473,9 +473,8 @@ If no such form is found, then return the CL-USER package."
             (progn
               (scan-forward point (lambda  (c) (char= c *this-character*)))
               (let ((char-at-point (char-at-point point)))
-                (if (char= *this-character* char-at-point)
-                  (vector-push-extend *this-character* *isearch-string*)
-                  (cancel-isearch))))
+                (when (char= *this-character* char-at-point)
+                  (vector-push-extend *this-character* *isearch-string*))))
             (let ((char-at-point (char-at-point point))
                   (next-char (progn (move-mark point 1)
                                     (character-right-of point)))) ;; FIXME: Hebrew
