@@ -1,0 +1,13 @@
+me - A Mezzano Editor
+---------------------
+
+me is a fork of the editor that comes with Mezzano, a Common Lisp
+operating system.  The original editor is not so good at handling
+large files, so initially this fork broke the one big file it was
+written in into many small ones for easier development.
+
+Original editor.lisp code written by Henry Harrington.
+
+License: MIT
+Author: Burton Samograd <burton.samograd@gmail.com>
+2015
