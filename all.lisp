@@ -1,11 +1,21 @@
+(sys.int::cal "home/med/package.lisp")
+
+(in-package :med)
+
+(defmacro awhen (cond &body body)
+  `(let ((it ,cond))
+     (when it
+       ,@body)))
+
 (defun cal (file)
    (handler-bind
      ;; automatically choose 'smash existing class' when loading
      ((t (lambda (c) 
-           (invoke-restart 'continue))))
+           (declare (ignore c))
+           (awhen (find-restart 'continue)
+             (invoke-restart it)))))
     (sys.int::cal file)))
 
-(cal "home/med/package.lisp")
 (cal "home/med/line.lisp")
 (cal "home/med/mark.lisp")
 (cal "home/med/editor.lisp")
