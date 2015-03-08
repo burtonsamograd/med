@@ -1,4 +1,4 @@
-(in-package :me)
+(in-package :med)
 
 ;;;; Begin command wrappers.
 

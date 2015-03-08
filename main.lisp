@@ -1,4 +1,4 @@
-(in-package :me)
+(in-package :med)
 
 (defun translate-command (editor character)
   "Translate a character to a command."

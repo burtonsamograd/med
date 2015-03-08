@@ -1,4 +1,4 @@
-(in-package :me)
+(in-package :med)
 
 ;;; Minibuffer stuff.
 
