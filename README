@@ -28,10 +28,6 @@ TODO:
 - show-paren-mode like paren matching by bolding the matching paren
 - auto indentation (basic electric newline?)
    
-- create *Messages* buffer
-  - create a stream type that will write to a buffer (buffer-stream)
-    -  https://github.com/sbcl/sbcl/blob/master/doc/manual/gray-streams-examples.texinfo
-      
 - undo
 - color highlighting (hard, might want to just use italic/bold for keywords at first)
 - file completion during C-x C-f
