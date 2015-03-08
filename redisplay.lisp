@@ -352,9 +352,9 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
                     (check-pending-input))))
               ;; clear minibuffer line
               (blit-display-line nil (+ (window-rows) 1))))
-          (let* ((mb (make-instance 'buffer)))
-            (insert mb "testing")
-            (render-modeline (render-display-line (first-line (current-buffer *editor*)) (lambda (x) x) t)
+          (let* ((modeline-buffer (make-instance 'buffer)))
+            (insert modeline-buffer "testing")
+            (render-modeline (render-display-line (first-line modeline-buffer) #'identity nil)
                              (window-rows)))
           ;; Prune the cache.
           (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
