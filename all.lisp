@@ -2,8 +2,7 @@
    (handler-bind
      ;; automatically choose 'smash existing class' when loading
      ((t (lambda (c) 
-           (let ((restart (find-restart 'continue)))
-             (when restart (invoke-restart restart))))))
+           (invoke-restart 'continue))))
     (sys.int::cal file)))
 
 (cal "home/med/package.lisp")
@@ -17,3 +16,6 @@
 (cal "home/med/commands.lisp")
 (cal "home/med/keybindings.lisp")
 (cal "home/med/main.lisp")
+
+(defun make ()
+   (cal "home/med/all.lisp"))
