@@ -1,0 +1,33 @@
+- make *default-pathname-defaults* buffer local
+
+- per buffer mode line
+
+- isearch
+  - When typing wrong characters in isearch they are appended to the *isearch-string*. 
+    They should be just discarded 
+  - Show current search string in minibuffer
+
+- repl window, so we can have some output scrollback (requires buffer-stream I think)
+- replace-string, query-replace, replace-regexp
+- search for regex
+- show-paren-mode like paren matching by bolding the matching paren
+- auto indentation (basic electric newline?)
+   
+- create *Messages* buffer
+  - create a stream type that will write to a buffer (buffer-stream)
+    -  https://github.com/sbcl/sbcl/blob/master/doc/manual/gray-streams-examples.texinfo
+      
+- create a proper minibuffer area for displaying messages and getting input
+  - curently the title contains some of what would be in a mode-line
+
+- undo
+- color highlighting (hard, might want to just use italic/bold for keywords at first)
+- file completion during C-x C-f
+- symbol completion during M-: 
+- jump/pop to/from source M-./M-* (see compiler for adding line/file information)
+- 'hippy' symbol completion M-/
+
+- Encoding BUG: saving gui/compositor.c caused some sort of encoding problem with
+  the pound symbol and another one. had to revert using git. also happens on 
+   copywrite symbol in the README.
+
