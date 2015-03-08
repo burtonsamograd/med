@@ -14,8 +14,6 @@ TODO:
 
 - connect editor windows so they are less indepdendent
 
-- execute-extended-command "M-x"
-
 - per buffer mode line
   - curently the title contains some of what would be in a mode-line
 
