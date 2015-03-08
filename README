@@ -1,12 +1,12 @@
-me - A Mezzano Editor
----------------------
+med - Mezzano EDitor
+----------------------
 
-me is a fork of the editor that comes with Mezzano, a Common Lisp
-operating system.  The original editor is not so good at handling
-large files, so initially this fork broke the one big file it was
-written in into many small ones for easier development.
+med is a fork of the original editor that comes with Mezzano, a 
+Common Lisp operating system.  The original editor is not so good 
+at handling large files, so initially this fork broke the one big 
+file it was written in into smaller ones for easier development.
 
-Original editor.lisp code written by Henry Harrington.
+Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
@@ -44,3 +44,7 @@ TODO:
 - Encoding BUG: saving gui/compositor.c caused some sort of encoding problem with
   the pound symbol and another one. had to revert using git. also happens on 
    copywrite symbol in the README.
+
+--
+Burton Samograd <burton.samograd@gmail.com>
+2015
