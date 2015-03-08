@@ -87,13 +87,14 @@
                 (setf (pending-redisplay *editor*) t))))))))))))
 
 (defun spawn (&key width height initial-file)
-  (mezzano.supervisor:make-thread (lambda () (editor-main width height initial-file))
-                                  :name "Editor"
-                                  :initial-bindings `((*terminal-io* ,(make-instance 'mezzano.gui.popup-io-stream:popup-io-stream
-                                                                                     :title "Editor console"))
-                                                      (*standard-input* ,(make-synonym-stream '*terminal-io*))
-                                                      (*standard-output* ,(make-synonym-stream '*terminal-io*))
-                                                      (*error-output* ,(make-synonym-stream '*terminal-io*))
-                                                      (*trace-output* ,(make-synonym-stream '*terminal-io*))
-                                                      (*debug-io* ,(make-synonym-stream '*terminal-io*))
-                                                      (*query-io* ,(make-synonym-stream '*terminal-io*)))))
+  (mezzano.supervisor:make-thread
+    (lambda () (editor-main width height initial-file))
+    :name "Editor"
+    :initial-bindings `((*terminal-io* ,(make-instance 'buffer-stream 
+                                                       :buffer-name "*Messages*"))
+                        (*standard-input* ,(make-synonym-stream '*terminal-io*))
+                        (*standard-output* ,(make-synonym-stream '*terminal-io*))
+                        (*error-output* ,(make-synonym-stream '*terminal-io*))
+                        (*trace-output* ,(make-synonym-stream '*terminal-io*))
+                        (*debug-io* ,(make-synonym-stream '*terminal-io*))
+                        (*query-io* ,(make-synonym-stream '*terminal-io*)))))

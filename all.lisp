@@ -20,6 +20,7 @@
 (cal "home/med/mark.lisp")
 (cal "home/med/editor.lisp")
 (cal "home/med/buffer.lisp")
+(cal "home/med/buffer-stream.lisp")
 (cal "home/med/point.lisp")
 (cal "home/med/minibuffer.lisp")
 (cal "home/med/redisplay.lisp")
