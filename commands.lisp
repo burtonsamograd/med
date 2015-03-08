@@ -402,7 +402,7 @@ If no such form is found, then return the CL-USER package."
   (let* ((buffer (current-buffer *editor*))
          (path (buffer-property buffer 'path)))
     (save-buffer-command)
-    (sys.int::cal path)))
+    (cal path)))
 
 (defun eval-last-sexp-command ()
    (let* ((buffer (current-buffer *editor*))
