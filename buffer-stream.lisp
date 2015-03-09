@@ -7,6 +7,7 @@
   (col-index-of stream))
 
 (defmethod sys.gray::stream-write-char ((stream buffer-stream) char)
-  (insert (get-buffer-create (buffer-stream-buffer-name stream)) char))
-
-(setf *messages* (make-instance 'buffer-stream :buffer-name "*Messages*"))
+  (let ((buffer (get-buffer-create (buffer-stream-buffer-name stream))))
+    (save-excursion (buffer)
+      (move-end-of-buffer buffer)
+      (insert buffer char))))
