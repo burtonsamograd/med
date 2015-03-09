@@ -19,7 +19,7 @@
                    (buffer-property *minibuffer* 'minibuffer-prompt-end)
                    (buffer-point *minibuffer*))))
 
-(defun read-from-minibuffer (prompt)
+(defun read-from-minibuffer (prompt &optional default-text)
   "Read a string from the minibuffer."
   (let ((old-key-map (global-key-map *editor*))
         (old-buffer (current-buffer *editor*))
@@ -34,7 +34,10 @@
            (push 'fix-minibuffer-point-position-hook (post-command-hooks *editor*))
            (switch-to-buffer *minibuffer*)
            (insert *minibuffer* prompt)
-           (setf (buffer-property *minibuffer* 'minibuffer-prompt-end) (copy-mark (buffer-point *minibuffer*) :left))
+           (setf (buffer-property *minibuffer* 'minibuffer-prompt-end) 
+                                  (copy-mark (buffer-point *minibuffer*) :left))
+           (when default-text
+             (insert *minibuffer* default-text))
            (catch 'minibuffer-result
              (editor-loop)))
       (switch-to-buffer old-buffer)
