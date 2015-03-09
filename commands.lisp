@@ -522,3 +522,5 @@ If no such form is found, then return the CL-USER package."
     (format t "Executing extended command: ~A~%" command)
     (eval (read-from-string command))))
 
+(defun new-frame-command ()
+  (spawn))
