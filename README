@@ -10,7 +10,10 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
-- optimize or cache (memoize?) buffer current package
+- why does everything slow to a crawl after some time?
+
+- optimize or cache (memoize?) buffer current package so we can put
+  the current file package in the modeline properly
 
 - isearch
   - When typing wrong characters in isearch they are appended to the *isearch-string*. 
@@ -21,6 +24,8 @@ TODO:
 - replace-string, query-replace, replace-regexp
 - search for regex
 - show-paren-mode like paren matching by bolding the matching paren
+  - added character attributes
+  - make redisplay render with bold font if :BOLD is set in the character attributes
 - auto indentation (basic electric newline?)
    
 - undo
