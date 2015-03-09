@@ -21,16 +21,14 @@
 
 (defun read-from-minibuffer (prompt &optional default-text)
   "Read a string from the minibuffer."
-  (let ((old-key-map (global-key-map))
-        (old-buffer (current-buffer *editor*))
+  (let ((old-buffer (current-buffer *editor*))
         (old-post-command-hooks (post-command-hooks *editor*)))
     (when (eql old-buffer *minibuffer*)
       (error "Recursive minibuffer read!"))
     (unwind-protect
          (progn
-           (setf *minibuffer* (make-instance 'buffer))
-           (setf (global-key-map) *minibuffer-key-map*
-                 (buffer-property *minibuffer* 'name) "*Minibuffer*")
+           (setf *minibuffer* (make-instance 'buffer :key-map *minibuffer-key-map*))
+           (setf (buffer-property *minibuffer* 'name) "*Minibuffer*")
            (push 'fix-minibuffer-point-position-hook (post-command-hooks *editor*))
            (switch-to-buffer *minibuffer*)
            (insert *minibuffer* prompt)
@@ -41,8 +39,7 @@
            (catch 'minibuffer-result
              (editor-loop)))
       (switch-to-buffer old-buffer)
-      (setf (global-key-map) old-key-map
-            (post-command-hooks *editor*) old-post-command-hooks))))
+      (setf (post-command-hooks *editor*) old-post-command-hooks))))
 
 (defun minibuffer-yes-or-no-p (&optional control &rest arguments)
   (let ((prompt (apply 'format nil control arguments)))
@@ -53,3 +50,14 @@
                ((string-equal line "no")
                 (return nil)))))))
 
+(defun initialize-minibuffer-key-map (key-map)
+  (initialize-key-map key-map)
+  (set-key #\Newline 'minibuffer-finish-input-command key-map)
+  (set-key #\C-M 'minibuffer-finish-input-command key-map)
+  (set-key '(#\C-X #\C-F) nil key-map)
+  (set-key '(#\C-X #\C-S) nil key-map)
+  (set-key '(#\C-X #\C-W) nil key-map)
+  (set-key '(#\C-X #\k) nil key-map)
+  (set-key '(#\C-X #\b) nil key-map)
+  (set-key '(#\C-X #\C-B) nil key-map)
+  (set-key #\C-C nil key-map))

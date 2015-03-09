@@ -77,15 +77,4 @@
   (set-key #\M-O 'find-matching-paren-command key-map)
   (set-key #\M-FULL_STOP 'find-symbol-at-point-command key-map))
 
-(defun initialize-minibuffer-key-map (key-map)
-  (initialize-key-map key-map)
-  (set-key #\Newline 'minibuffer-finish-input-command key-map)
-  (set-key #\C-M 'minibuffer-finish-input-command key-map)
-  (set-key '(#\C-X #\C-F) nil key-map)
-  (set-key '(#\C-X #\C-S) nil key-map)
-  (set-key '(#\C-X #\C-W) nil key-map)
-  (set-key '(#\C-X #\k) nil key-map)
-  (set-key '(#\C-X #\b) nil key-map)
-  (set-key '(#\C-X #\C-B) nil key-map)
-  (set-key #\C-C nil key-map))
 
