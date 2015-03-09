@@ -261,12 +261,14 @@
          (modeline-buffer (get-buffer-create " *Modeline*"))
          (modeline-string (buffer-property buffer 'modeline)))
     (insert modeline-buffer
-      (format nil " [~A] ~A L~S    (Editor: ~A)" 
+      (format nil " [~A] ~A L~S C~S    (~A)" 
          (if (buffer-modified buffer) "*" " ")
          (buffer-property buffer 'name)
          (1+ (truncate (line-number (mark-line (buffer-point buffer))) 10000))
-         *package*)) ;; TODO: this should really be (buffer-current-package buffer)
-                     ;;       but it's far too slow to be usable right now
+         (1+ (mark-charpos (buffer-point buffer)))
+         ;;(buffer-current-package buffer)
+         *package* ; TODO: uncomment above when buffer-current-package is faster
+         ))
     (render-display-line (first-line modeline-buffer)
        (lambda (l) (blit-display-line l (window-rows))) t)
     (kill-buffer modeline-buffer)))
