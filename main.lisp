@@ -8,6 +8,11 @@
     command))
 
 (defun editor-loop ()
+  (flet ((call-command (command)
+           (let ((buffer (current-buffer *editor*)))
+             (mapc 'funcall (buffer-pre-command-hooks buffer))
+             (funcall *this-command*)
+             (mapc 'funcall (buffer-post-command-hooks buffer)))))
   (loop
      (let* ((*this-character* (editor-read-char))
             (*this-chord* (list *this-character*))
@@ -20,20 +25,16 @@
                  (when (not (hash-table-p *this-command*))
                    (setf *this-chord* (reverse *this-chord*))
                    (cond (*this-command*
-                          (mapc 'funcall (pre-command-hooks *editor*))
-                          (funcall *this-command*)
-                          (mapc 'funcall (post-command-hooks *editor*)))
+                           (call-command *this-command*))
                          (t (format t "Unknown command ~S~%" *this-chord*)))
                    (return))))
              (*this-command*
-              (mapc 'funcall (pre-command-hooks *editor*))
-              (funcall *this-command*)
-              (mapc 'funcall (post-command-hooks *editor*)))
+               (call-command *this-command*))
              (t (format t "Unknown command ~S~%" *this-character*)))
        (setf *last-command* *this-command*
              *last-character* *this-character*
              *last-chord* *this-chord*)
-       (setf (pending-redisplay *editor*) (not (redisplay))))))
+       (setf (pending-redisplay *editor*) (not (redisplay)))))))
 
 (defun editor-main (width height initial-file)
   (mezzano.gui.font:with-font (font mezzano.gui.font:*default-monospace-font* mezzano.gui.font:*default-monospace-font-size*)
@@ -104,3 +105,15 @@
                         (*trace-output* ,(make-synonym-stream '*terminal-io*))
                         (*debug-io* ,(make-synonym-stream '*terminal-io*))
                         (*query-io* ,(make-synonym-stream '*terminal-io*)))))
+
+#+(or) (defun spawn (&key width height initial-file)
+  (mezzano.supervisor:make-thread (lambda () (editor-main width height initial-file))
+                                  :name "Editor"
+                                  :initial-bindings `((*terminal-io* ,(make-instance 'mezzano.gui.popup-io-stream:popup-io-stream
+                                                                                     :title "Editor console"))
+                                                      (*standard-input* ,(make-synonym-stream '*terminal-io*))
+                                                      (*standard-output* ,(make-synonym-stream '*terminal-io*))
+                                                      (*error-output* ,(make-synonym-stream '*terminal-io*))
+                                                      (*trace-output* ,(make-synonym-stream '*terminal-io*))
+                                                      (*debug-io* ,(make-synonym-stream '*terminal-io*))
+                                                      (*query-io* ,(make-synonym-stream '*terminal-io*)))))

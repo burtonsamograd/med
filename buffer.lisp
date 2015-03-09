@@ -9,10 +9,14 @@
    (%mark :reader buffer-mark)
    (%mark-active :initarg :mark-active :accessor buffer-mark-active)
    (%key-map :initarg :key-map :accessor buffer-key-map)
+   (%pre-command-hooks :initarg :pre-command-hooks :accessor buffer-pre-command-hooks)
+   (%post-command-hooks :initarg :post-command-hooks :accessor buffer-post-command-hooks)
    (%properties))
   (:default-initargs 
      :mark-active nil
-     :key-map (make-hash-table)))
+     :key-map (make-hash-table)
+     :pre-command-hooks '()
+     :post-command-hooks '()))
 
 (defgeneric buffer-property (buffer property-name &optional default))
 (defgeneric (setf buffer-property) (value buffer property-name &optional default))

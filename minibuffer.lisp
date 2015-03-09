@@ -21,15 +21,16 @@
 
 (defun read-from-minibuffer (prompt &optional default-text)
   "Read a string from the minibuffer."
-  (let ((old-buffer (current-buffer *editor*))
-        (old-post-command-hooks (post-command-hooks *editor*)))
+  (let ((old-buffer (current-buffer *editor*)))
     (when (eql old-buffer *minibuffer*)
       (error "Recursive minibuffer read!"))
     (unwind-protect
          (progn
-           (setf *minibuffer* (make-instance 'buffer :key-map *minibuffer-key-map*))
+           (setf *minibuffer* 
+                 (make-instance 'buffer
+                                :key-map *minibuffer-key-map*
+                                :post-command-hooks '(fix-minibuffer-point-position-hook)))
            (setf (buffer-property *minibuffer* 'name) "*Minibuffer*")
-           (push 'fix-minibuffer-point-position-hook (post-command-hooks *editor*))
            (switch-to-buffer *minibuffer*)
            (insert *minibuffer* prompt)
            (setf (buffer-property *minibuffer* 'minibuffer-prompt-end) 
@@ -38,8 +39,8 @@
              (insert *minibuffer* default-text))
            (catch 'minibuffer-result
              (editor-loop)))
-      (switch-to-buffer old-buffer)
-      (setf (post-command-hooks *editor*) old-post-command-hooks))))
+      (switch-to-buffer old-buffer))))
+
 
 (defun minibuffer-yes-or-no-p (&optional control &rest arguments)
   (let ((prompt (apply 'format nil control arguments)))

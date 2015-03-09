@@ -460,10 +460,11 @@ If no such form is found, then return the CL-USER package."
 
 (defun cancel-isearch ()
   (format t "Cancelling isearch.~%")
-  (setf (pre-command-hooks *editor*)
-        (remove 'isearch-pre-command-hook (pre-command-hooks *editor*)))
-  (setf (post-command-hooks *editor*)
-        (remove 'isearch-post-command-hook (post-command-hooks *editor*))))
+  (let ((buffer (current-buffer *editor*)))
+    (setf (buffer-pre-command-hooks buffer)
+          (remove 'isearch-pre-command-hook (buffer-pre-command-hooks buffer)))
+    (setf (buffer-post-command-hooks buffer)
+          (remove 'isearch-post-command-hook (buffer-post-command-hooks buffer)))))
 
 (defun isearch-pre-command-hook ()
   (unless (or (eq *this-command* 'self-insert-command)
@@ -499,13 +500,14 @@ If no such form is found, then return the CL-USER package."
 
 
 (defun isearch-command ()
-  (unless (member 'isearch-post-command-hook (post-command-hooks *editor*))
-    (if (< 0 (length *isearch-string*))
-      (setf *last-isearch-string* *isearch-string*))
-    (format t "Starting isearch (Default: ~S)...~%" (coerce *last-isearch-string* 'string))
-    (setf *isearch-string* nil)
-    (push 'isearch-pre-command-hook (pre-command-hooks *editor*))
-    (push 'isearch-post-command-hook (post-command-hooks *editor*))))
+  (let ((buffer (current-buffer *editor*)))
+    (unless (member 'isearch-post-command-hook (buffer-post-command-hooks buffer))
+      (if (< 0 (length *isearch-string*))
+        (setf *last-isearch-string* *isearch-string*))
+      (format t "Starting isearch (Default: ~S)...~%" (coerce *last-isearch-string* 'string))
+      (setf *isearch-string* nil)
+      (push 'isearch-pre-command-hook (buffer-pre-command-hooks buffer))
+      (push 'isearch-post-command-hook (buffer-post-command-hooks buffer)))))
 
 (defun find-symbol-at-point-command ()
   (let* ((buffer (current-buffer *editor*))
