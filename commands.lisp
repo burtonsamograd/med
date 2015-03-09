@@ -127,10 +127,11 @@
 
 (defun find-file (path)
   (setf path (merge-pathnames path))
-  (dolist (buffer (buffer-list *editor*))
+  (dolist (buffer (buffer-list))
     (when (equal (buffer-property buffer 'path) path)
       (switch-to-buffer buffer)
-      (setf *default-pathname-defaults* (make-pathname :name nil :type nil :version :newest :defaults path))
+      (setf (buffer-property buffer 'default-pathname-defaults)
+            (make-pathname :name nil :type nil :version :newest :defaults path))
       (return-from find-file)))
   (let ((buffer (make-instance 'buffer)))
     (if (pathname-name path)
@@ -158,22 +159,26 @@
           (directory (merge-pathnames "*.*" path)))
         (setf (buffer-property buffer 'new-file) t)
         (rename-buffer buffer (directory-namestring path))))
-    (push buffer (buffer-list *editor*))
+    (push buffer (buffer-list))
     (setf (buffer-property buffer 'path) path)
     (move-beginning-of-buffer buffer)
     ;; Loading the file will set the modified flag.
     (setf (buffer-modified buffer) nil)
     (switch-to-buffer buffer)
-    (setf *default-pathname-defaults* (make-pathname :name nil :type nil :version :newest :defaults path))))
+    (setf (buffer-property buffer 'default-pathname-defaults)
+          (make-pathname :name nil :type nil :version :newest :defaults path))))
 
 (defun find-file-command ()
   (find-file (read-from-minibuffer "Find file: " 
-                                   (namestring *default-pathname-defaults*))))
+                                   (namestring 
+                                     (or (buffer-property (current-buffer *editor*)                                                                  'default-pathname-defaults)
+                                         *default-pathname-defaults*)))))
 
 (defun save-buffer-command ()
   (let ((buffer (current-buffer *editor*)))
     (when (not (buffer-property buffer 'path))
-      (let* ((path (read-from-minibuffer (format nil "Write file (default ~S): " *default-pathname-defaults*)))
+      (let* ((path (read-from-minibuffer (format nil "Write file (default ~S): " 
+                                                 (buffer-property buffer 'default-pathname-defaults))))
              (filespec (merge-pathnames path)))
         (rename-buffer buffer (file-namestring filespec))
         (setf (buffer-property buffer 'path) filespec)))
@@ -193,8 +198,9 @@
 (defun write-file-command ()
   (let* ((buffer (current-buffer *editor*))
          (*default-pathname-defaults* (or (buffer-property buffer 'path)
-                                          *default-pathname-defaults*))
-         (path (read-from-minibuffer (format nil "Write file (default ~S): " *default-pathname-defaults*)))
+                                          (buffer-property buffer 'default-pathname-defaults)))
+         (path (read-from-minibuffer "Write file: " 
+                                     (namestring *default-pathname-defaults*)))
          (filespec (merge-pathnames path)))
     (rename-buffer buffer (file-namestring filespec))
     (setf (buffer-property buffer 'path) filespec)
@@ -217,7 +223,7 @@
     (delete-region buffer
                    (make-mark (first-line buffer) 0)
                    (make-mark (last-line buffer) (line-length (last-line buffer))))
-    (dolist (b (buffer-list *editor*))
+    (dolist (b (buffer-list))
       (insert buffer (buffer-property b 'name))
       (insert buffer #\Newline))
     (setf (buffer-modified buffer) nil)))
@@ -249,22 +255,22 @@
   (or (get-buffer name)
       (let ((buffer (make-instance 'buffer)))
         (setf (buffer-property buffer 'name) name)
-        (push buffer (buffer-list *editor*))
+        (push buffer (buffer-list))
         buffer)))
 
 (defun get-buffer (name)
-  (dolist (b (buffer-list *editor*))
+  (dolist (b (buffer-list))
     (when (string-equal (buffer-property b 'name) name)
       (return b))))
 
 (defun kill-buffer (buffer)
-  (setf (buffer-list *editor*) (remove buffer (buffer-list *editor*)))
+  (setf (buffer-list) (remove buffer (buffer-list)))
   (when (eql buffer (last-buffer *editor*))
     (setf (last-buffer *editor*) nil))
   (when (eql buffer (current-buffer *editor*))
     (switch-to-buffer
-     (if (buffer-list *editor*)
-         (first (buffer-list *editor*))
+     (if (buffer-list)
+         (first (buffer-list))
          (get-buffer-create "*Scratch*")))))
 
 (defun unique-name (name &optional version)

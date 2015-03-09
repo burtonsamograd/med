@@ -12,10 +12,6 @@ TODO:
 
 - optimize or cache (memoize?) buffer current package
 
-- make *default-pathname-defaults* buffer local
-
-- connect editor windows so they are less indepdendent
-
 - isearch
   - When typing wrong characters in isearch they are appended to the *isearch-string*. 
     They should be just discarded 

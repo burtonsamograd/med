@@ -190,8 +190,8 @@ Don't use this directly, use INSERT instead."
                          mark-1 mark-2))
 
 (defun yank-region (buffer)
-  (when (killed-region *editor*)
-    (insert-region buffer (car (killed-region *editor*)) (cdr (killed-region *editor*)))))
+  (when (killed-region)
+    (insert-region buffer (car (killed-region)) (cdr (killed-region)))))
 
 (defun delete-region (buffer mark-1 mark-2)
   "Delete region designated by MARK-1 and MARK-2 from buffer.
@@ -291,13 +291,13 @@ Returns the deleted region as a pair of marks into a disembodied line."
     (when (or (not (mark= first-mark last-mark))
               (eql *last-command* 'kill-region))
       (setf *this-command* 'kill-region))
-    (cond ((and (killed-region *editor*)
+    (cond ((and (killed-region)
                 (eql *last-command* 'kill-region))
            ;; Append to killed region.
-           (insert-region-at-mark (cdr (killed-region *editor*))
+           (insert-region-at-mark (cdr (killed-region))
                                   first-mark last-mark))
           (t ;; New killed region.
-           (setf (killed-region *editor*) (cons first-mark last-mark))))))
+           (setf (killed-region) (cons first-mark last-mark))))))
 
 (defun kill-line (buffer)
   "Kill from point to the end of the line. If the point is at the end of the line,
@@ -332,5 +332,6 @@ then merge the current line and next line."
           (vector-push-extend #\Newline string)
           (vector-push-extend (line-character (mark-line m1) (mark-charpos m1)) string))
       (move-mark m1))
-    (coerce string 'string)))
+    string))
+
 
