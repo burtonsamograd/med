@@ -52,7 +52,6 @@
                 (return nil)))))))
 
 (defun initialize-minibuffer-key-map (key-map)
-  (initialize-key-map key-map)
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
   (set-key #\C-M 'minibuffer-finish-input-command key-map)
   (set-key '(#\C-X #\C-F) nil key-map)

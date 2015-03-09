@@ -2,8 +2,9 @@
 
 (defun translate-command (character)
   "Translate a character to a command."
-  (let ((command (gethash character (buffer-key-map (current-buffer *editor*)))))
-    (unless command
+  (multiple-value-bind (command found-p)
+    (gethash character (buffer-key-map (current-buffer *editor*)))
+    (unless found-p
       (setf command (gethash character (global-key-map))))
     command))
 
