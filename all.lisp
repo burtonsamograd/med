@@ -7,6 +7,18 @@
      (when it
        ,@body)))
 
+(defun cal-1 (path)
+  "Compile and load PATH.
+If the compiled file is out of date, recompile and load it."
+  (let ((compiled (compile-file-pathname path)))
+    (when (or (not (probe-file compiled))
+              (<= (file-write-date compiled) (file-write-date path)))
+      (format t "; Compiling ~S~%" path)
+      (ignore-errors (delete-file compiled))
+      (compile-file path)
+      (format t "; Loading ~S~%" compiled)
+      (load compiled))))
+
 (defun cal (file)
    (handler-bind
      ;; automatically choose 'smash existing class' when loading
@@ -14,7 +26,7 @@
            (declare (ignore c))
            (awhen (find-restart 'continue)
              (invoke-restart it)))))
-    (sys.int::cal file)))
+    (cal-1 file)))
 
 (cal "home/med/line.lisp")
 (cal "home/med/mark.lisp")
