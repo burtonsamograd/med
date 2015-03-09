@@ -10,12 +10,11 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
+- optimize or cache (memoize?) buffer current package
+
 - make *default-pathname-defaults* buffer local
 
 - connect editor windows so they are less indepdendent
-
-- per buffer mode line
-  - curently the title contains some of what would be in a mode-line
 
 - isearch
   - When typing wrong characters in isearch they are appended to the *isearch-string*. 
