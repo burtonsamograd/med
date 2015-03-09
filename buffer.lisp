@@ -8,8 +8,11 @@
    (%point :reader buffer-point)
    (%mark :reader buffer-mark)
    (%mark-active :initarg :mark-active :accessor buffer-mark-active)
+   (%key-map :initarg :key-map :accessor buffer-key-map)
    (%properties))
-  (:default-initargs :mark-active nil))
+  (:default-initargs 
+     :mark-active nil
+     :key-map (make-hash-table)))
 
 (defgeneric buffer-property (buffer property-name &optional default))
 (defgeneric (setf buffer-property) (value buffer property-name &optional default))

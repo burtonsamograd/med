@@ -10,10 +10,14 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
+- make pre/post-command-hooks buffer local
+- make buffer local key map
+
 - why does everything slow to a crawl after some time?
 
 - optimize or cache (memoize?) buffer current package so we can put
   the current file package in the modeline properly
+
 
 - isearch
   - When typing wrong characters in isearch they are appended to the *isearch-string*. 
@@ -34,6 +38,7 @@ TODO:
 - symbol completion during M-: 
 - jump/pop to/from source M-./M-* (see compiler for adding line/file information)
 - 'hippy' symbol completion M-/
+- fill
 
 - Encoding BUG: saving gui/compositor.c caused some sort of encoding problem with
   the pound symbol and another one. had to revert using git. also happens on 

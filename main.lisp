@@ -2,7 +2,10 @@
 
 (defun translate-command (character)
   "Translate a character to a command."
-  (gethash character (global-key-map)))
+  (let ((command (gethash character (buffer-key-map (current-buffer *editor*)))))
+    (unless command
+      (setf command (gethash character (global-key-map))))
+    command))
 
 (defun editor-loop ()
   (loop
@@ -77,17 +80,17 @@
     (let ((buffer (get-buffer-create "*Messages*")))
       (insert buffer "Welcome to the Mezzano EDitor. Happy Hacking!")
       (insert buffer #\Newline))
-        (ignore-errors
-          (when initial-file
-            (find-file initial-file)))
-          (catch 'quit
-            (loop
-              (handler-case
-                (editor-loop)
-                (error (c)
-                (ignore-errors
-                  (format t "Editor error: ~A~%" c)
-                  (setf (pending-redisplay *editor*) t))))))))))))
+      (ignore-errors
+        (when initial-file
+          (find-file initial-file)))
+        (catch 'quit
+          (loop
+            (handler-case
+              (editor-loop)
+              (error (c)
+              (ignore-errors
+                (format t "Editor error: ~A~%" c)
+                (setf (pending-redisplay *editor*) t))))))))))))
 
 (defun spawn (&key width height initial-file)
   (mezzano.supervisor:make-thread
