@@ -101,17 +101,3 @@
                         (*trace-output* ,(make-synonym-stream '*terminal-io*))
                         (*debug-io* ,(make-synonym-stream '*terminal-io*))
                         (*query-io* ,(make-synonym-stream '*terminal-io*)))))
-
-;; Keep this around for a bit for early debugging
-#+() (defun spawn (&key width height initial-file)
-  (mezzano.supervisor:make-thread (lambda () (editor-main width height initial-file))
-                                  :name "Editor"
-                                  :initial-bindings `((*terminal-io* ,(make-instance 'mezzano.gui.popup-io-stream:popup-io-stream
-                                                                                     :title "Editor console"))
-                                                      (*standard-input* ,(make-synonym-stream '*terminal-io*))
-                                                      (*standard-output* ,(make-synonym-stream '*terminal-io*))
-                                                      (*error-output* ,(make-synonym-stream '*terminal-io*))
-                                                      (*trace-output* ,(make-synonym-stream '*terminal-io*))
-                                                      (*debug-io* ,(make-synonym-stream '*terminal-io*))
-                                                      (*query-io* ,(make-synonym-stream '*terminal-io*)))))
-
