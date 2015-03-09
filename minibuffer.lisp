@@ -21,7 +21,7 @@
 
 (defun read-from-minibuffer (prompt &optional default-text)
   "Read a string from the minibuffer."
-  (let ((old-key-map (global-key-map *editor*))
+  (let ((old-key-map (global-key-map))
         (old-buffer (current-buffer *editor*))
         (old-post-command-hooks (post-command-hooks *editor*)))
     (when (eql old-buffer *minibuffer*)
@@ -29,7 +29,7 @@
     (unwind-protect
          (progn
            (setf *minibuffer* (make-instance 'buffer))
-           (setf (global-key-map *editor*) *minibuffer-key-map*
+           (setf (global-key-map) *minibuffer-key-map*
                  (buffer-property *minibuffer* 'name) "*Minibuffer*")
            (push 'fix-minibuffer-point-position-hook (post-command-hooks *editor*))
            (switch-to-buffer *minibuffer*)
@@ -41,7 +41,7 @@
            (catch 'minibuffer-result
              (editor-loop)))
       (switch-to-buffer old-buffer)
-      (setf (global-key-map *editor*) old-key-map
+      (setf (global-key-map) old-key-map
             (post-command-hooks *editor*) old-post-command-hooks))))
 
 (defun minibuffer-yes-or-no-p (&optional control &rest arguments)
