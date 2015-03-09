@@ -186,7 +186,8 @@
         (when (next-line line)
           (terpri s))))
     (setf (buffer-property buffer 'new-file) nil
-          (buffer-modified buffer) nil)))
+          (buffer-modified buffer) nil)
+    (format t "Wrote ~S~%" (buffer-property buffer 'path))))
 
 (defun write-file-command ()
   (let* ((buffer (current-buffer *editor*))
@@ -205,7 +206,8 @@
         (write-sequence (data line) s)
         (terpri s)))
     (setf (buffer-property buffer 'new-file) nil
-          (buffer-modified buffer) nil)))
+          (buffer-modified buffer) nil)
+    (format t "Wrote ~S~%" (buffer-property buffer 'path))))
 
 (defun list-buffers-command ()
   (let ((buffer (get-buffer-create "*Buffers*")))
@@ -338,6 +340,7 @@ and mark."
 (defun buffer-current-package (buffer)
   "From point, search backwards for a top-level IN-PACKAGE form.
 If no such form is found, then return the CL-USER package."
+  ;; TODO: create a cache for this
   (let ((point (current-buffer *editor*))
         (temporary-package (make-package (gensym))))
     (import 'in-package temporary-package)
@@ -375,7 +378,7 @@ If no such form is found, then return the CL-USER package."
 ;        (format t "Read ~S in package ~S~%" str package)
         (let ((form (let ((*package* package))
                       (read-from-string str))))
-          (format t "Eval ~S~%" form)
+          (format t "Evaluated ~S~%" (cadr form))
           (eval form))))))
 
 (defun beginning-of-top-level-form-command ()
