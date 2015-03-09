@@ -10,8 +10,9 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
-- make pre/post-command-hooks buffer local
-- make buffer local key map
+- other frame doesn't refresh when buffer is modified; force redraw on insert?
+- update isearch to use buffer local pre and post command hooks
+- C-x s - save-some-buffers-command
 
 - why does everything slow to a crawl after some time?
 
