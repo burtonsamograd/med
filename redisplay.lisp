@@ -366,10 +366,10 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
                     (setf (aref current-screen y) line)
                     (check-pending-input))))
               ;; render the messages line
-	      (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
-		(when line
-		  (render-display-line line
-				       (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
+          (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
+            (when line
+              (render-display-line line
+                (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
             (render-mode-line)
           ;; Prune the cache.
           (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
