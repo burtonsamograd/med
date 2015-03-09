@@ -203,7 +203,7 @@
                        :if-does-not-exist :create)
       (do ((line (first-line buffer) (next-line line)))
           ((not line))
-        (write-sequence (data line) s)
+        (write-sequence (map 'string #'car (data line)) s)
         (terpri s)))
     (setf (buffer-property buffer 'new-file) nil
           (buffer-modified buffer) nil)
