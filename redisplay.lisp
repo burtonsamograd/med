@@ -1,7 +1,5 @@
 (in-package :med)
 
-;;; Redisplay.
-
 (defun redraw-screen ()
   "Redraw the whole screen. For use when the display is corrupted."
   ;; Flush the current screen and line cache.
@@ -258,6 +256,21 @@
       (setf (mark-line top-line-mark) (display-line-line new-top-line))
             (mark-charpos top-line-mark) (display-line-start new-top-line))))
 
+(defun render-mode-line ()
+  (let* ((buffer (current-buffer *editor*))
+         (modeline-buffer (get-buffer-create " *Modeline*"))
+         (modeline-string (buffer-property buffer 'modeline)))
+    (insert modeline-buffer
+      (format nil " [~A] ~A L~S    (Editor: ~A)" 
+         (if (buffer-modified buffer) "*" " ")
+         (buffer-property buffer 'name)
+         (1+ (truncate (line-number (mark-line (buffer-point buffer))) 10000))
+         *package*)) ;; TODO: this should really be (buffer-current-package buffer)
+                     ;;       but it's far too slow to be usable right now
+    (render-display-line (first-line modeline-buffer)
+       (lambda (l) (blit-display-line l (window-rows))) t)
+    (kill-buffer modeline-buffer)))
+
 (defun redisplay ()
   "Perform an incremental redisplay cycle.
 Returns true when the screen is up-to-date, false if the screen is dirty and there is pending input."
@@ -350,15 +363,13 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
                     (blit-display-line line y)
                     (setf (aref current-screen y) line)
                     (check-pending-input))))
-              ;; clear minibuffer line
-              (blit-display-line nil (+ (window-rows) 1))))
-          (let* ((modeline-buffer (make-instance 'buffer)))
-            (insert modeline-buffer "testing")
-            (render-modeline (render-display-line (first-line modeline-buffer) #'identity nil)
-                             (window-rows)))
+              ;; render the messages line
+              (render-display-line (previous-line (last-line 
+                                                    (get-buffer-create "*Messages*")))
+                  (lambda (l) (blit-display-line l (1+ (window-rows)))))))
+            (render-mode-line)
           ;; Prune the cache.
           (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
         t)
     (pending-input ()
       nil)))
-
