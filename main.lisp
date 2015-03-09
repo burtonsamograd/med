@@ -1,14 +1,14 @@
 (in-package :med)
 
-(defun translate-command (editor character)
+(defun translate-command (character)
   "Translate a character to a command."
-  (gethash character (global-key-map editor)))
+  (gethash character (global-key-map)))
 
 (defun editor-loop ()
   (loop
      (let* ((*this-character* (editor-read-char))
             (*this-chord* (list *this-character*))
-            (*this-command* (translate-command *editor* *this-character*)))
+            (*this-command* (translate-command *this-character*)))
        (cond ((hash-table-p *this-command*)
               (loop
                  (setf *this-character* (editor-read-char)
@@ -57,7 +57,7 @@
       (*minibuffer* (make-instance 'buffer))
       (*minibuffer-key-map* (make-hash-table))
       (*default-pathname-defaults* *default-pathname-defaults*))
-         (initialize-key-map (global-key-map *editor*))
+         (initialize-key-map (global-key-map))
          (initialize-minibuffer-key-map *minibuffer-key-map*)
          (mezzano.gui.widgets:draw-frame frame)
          (multiple-value-bind (left right top bottom)
