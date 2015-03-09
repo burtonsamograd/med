@@ -1,4 +1,4 @@
-(eval-when (:compile-toplevel)
+(eval-when (:compile-toplevel :load-toplevel)
   (sys.int::cal "home/med/package.lisp"))
 
 (in-package :med)
