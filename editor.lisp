@@ -124,12 +124,10 @@
 (defun refresh-title ()
   (let ((buffer (current-buffer *editor*)))
     (setf (mezzano.gui.widgets:frame-title (frame *editor*))
-          (format nil "Editor - ~A~A"
-                  (or (buffer-property buffer 'name) "Untitled")
+          (format nil "MED - ~A~A"
+                  (or (buffer-property buffer 'path) "Untitled")
                   (cond ((buffer-property buffer 'new-file)
                          " (New file)")
-                        ((buffer-modified buffer)
-                         " (Modified)")
                         (t ""))))
     (mezzano.gui.widgets:draw-frame (frame *editor*))))
 
