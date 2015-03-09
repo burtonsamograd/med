@@ -375,8 +375,7 @@ If no such form is found, then return the CL-USER package."
 ;        (format t "Read ~S in package ~S~%" str package)
         (let ((form (let ((*package* package))
                       (read-from-string str))))
-;          (format t "Eval ~S~%" form)
-          (format t "Evaluated expression ~A.~%" (cadr form))
+          (format t "Eval ~S~%" form)
           (eval form))))))
 
 (defun beginning-of-top-level-form-command ()
@@ -392,7 +391,7 @@ If no such form is found, then return the CL-USER package."
     (newline-command)))
 
 (defun eval-expression-command ()
-  (print (eval (read-from-string (read-from-minibuffer "Eval: ")))))
+  (format t "~A~%" (eval (read-from-string (read-from-minibuffer "Eval: ")))))
 
 (defun copy-region-command ()
   (kill-region-command)
