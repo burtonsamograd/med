@@ -9,17 +9,14 @@
    (%pending-redisplay :initarg :pending-redisplay :accessor pending-redisplay)
    (%window :initarg :window :accessor window)
    (%frame :initarg :frame :accessor frame)
-   (%buffer-list :initarg :buffer-list :accessor buffer-list)
    (%buffer :initarg :buffer :accessor current-buffer)
    (%last-buffer :initarg :last-buffer :accessor last-buffer)
    (%font :initarg :font :reader font)
    (%font-bold :initarg :font-bold :reader font-bold)
-   (%foreground-colour :initarg :foreground-colour :accessor foreground-colour)
-   (%background-colour :initarg :background-colour :accessor background-colour)
-   (%killed-region :initarg :killed-region :accessor killed-region)
-   (%global-key-map :initarg :global-key-map :accessor global-key-map)
    (%pre-command-hooks :initarg :pre-command-hooks :accessor pre-command-hooks)
    (%post-command-hooks :initarg :post-command-hooks :accessor post-command-hooks)
+   (%foreground-colour :initarg :foreground-colour :accessor foreground-colour)
+   (%background-colour :initarg :background-colour :accessor background-colour)
    ;; Redisplay state.
    (%current-screen :initarg :screen :accessor editor-current-screen)
    (%line-cache :initarg :display-line-cache :accessor display-line-cache))
@@ -27,10 +24,7 @@
                      :pending-redisplay t
                      :foreground-colour mezzano.gui:*default-foreground-colour*
                      :background-colour mezzano.gui:*default-background-colour*
-                     :buffer-list '()
                      :last-buffer '()
-                     :killed-region nil
-                     :global-key-map (make-hash-table)
                      :pre-command-hooks '()
                      :post-command-hooks '()
                      :screen nil
@@ -49,8 +43,20 @@
 (defvar *minibuffer-key-map*)
 (defvar *isearch-string* (make-array 0 :element-type 'character :adjustable t :fill-pointer t))
 (defvar *last-isearch-string* *isearch-string*)
+(defvar *buffer-list* '())
+(defvar *killed-region* '())
+(defvar *global-key-map* (make-hash-table))
 
 (defvar *editor*)
+
+(defun buffer-list () *buffer-list*)
+(defun (setf buffer-list) (value) (setf *buffer-list* value))
+
+(defun killed-region () *killed-region*)
+(defun (setf killed-region) (value) (setf *killed-region* value))
+
+(defun global-key-map () *global-key-map*)
+(defun (setf global-key-map) (value) (setf *global-key-map* value))
 
 (defgeneric dispatch-event (editor event)
   (:method (editor event)))

@@ -167,7 +167,8 @@
     (setf *default-pathname-defaults* (make-pathname :name nil :type nil :version :newest :defaults path))))
 
 (defun find-file-command ()
-  (find-file (read-from-minibuffer (format nil "Find file (default ~S): " *default-pathname-defaults*))))
+  (find-file (read-from-minibuffer "Find file: " 
+                                   (namestring *default-pathname-defaults*))))
 
 (defun save-buffer-command ()
   (let ((buffer (current-buffer *editor*)))
