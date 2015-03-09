@@ -511,6 +511,7 @@ If no such form is found, then return the CL-USER package."
           (return)))))
 
 (defun execute-extended-command ()
-  (let ((command (concatenate 'string "(me::" (read-from-minibuffer "M-x ") "-command)")))
+  (let ((command (concatenate 'string "(meD::" (read-from-minibuffer "M-x ") "-command)")))
     (format t "Executing extended command: ~A~%" command)
     (eval (read-from-string command))))
+
