@@ -50,7 +50,7 @@
   (set-key #\C-Y 'yank-command key-map)
   (set-key '(#\C-X #\C-F) 'find-file-command key-map)
   (set-key '(#\C-X #\C-S) 'save-buffer-command key-map)
-  (set-key '(#\C-X #\S) 'save-some-buffers-command key-map)
+  (set-key '(#\C-X #\s) 'save-some-buffers-command key-map)
   (set-key '(#\C-X #\C-W) 'write-file-command key-map)
   (set-key '(#\C-X #\k) 'kill-buffer-command key-map)
   (set-key '(#\C-X #\b) 'switch-to-buffer-command key-map)
