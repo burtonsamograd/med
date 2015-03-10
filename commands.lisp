@@ -426,8 +426,8 @@ If no such form is found, then return the CL-USER package."
   (format t "~A~%" (eval (read-from-string (read-from-minibuffer "Eval: ")))))
 
 (defun copy-region-command ()
-  (kill-region-command)
-  (yank-command))
+  (let ((buffer (current-buffer *editor*)))
+    (copy-region buffer (buffer-point buffer) (buffer-mark buffer))))
 
 (defun compile-buffer-command ()
   (let* ((buffer (current-buffer *editor*))

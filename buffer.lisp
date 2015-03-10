@@ -306,6 +306,10 @@ Returns the deleted region as a pair of marks into a disembodied line."
           (t ;; New killed region.
            (setf (killed-region) (cons first-mark last-mark))))))
 
+(defun copy-region (buffer mark-1 mark-2)
+   (declare (ignore buffer))
+   (setf (killed-region) (cons mark-1 mark-2)))
+
 (defun kill-line (buffer)
   "Kill from point to the end of the line. If the point is at the end of the line,
 then merge the current line and next line."
