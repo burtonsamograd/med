@@ -174,6 +174,8 @@
                                      (or (buffer-property (current-buffer *editor*)                                                                  'default-pathname-defaults)
                                          *default-pathname-defaults*)))))
 
+;; TODO: factor out the buffer saving from the below 3 functions into defun save-buffer
+
 (defun save-buffer-command ()
   (let ((buffer (current-buffer *editor*)))
     (when (not (buffer-property buffer 'path))
@@ -195,10 +197,30 @@
           (buffer-modified buffer) nil)
     (format t "Wrote ~S~%" (buffer-property buffer 'path))))
 
+(defun save-some-buffers-command ()
+  (dolist (buffer (buffer-list))
+    (when (and (buffer-modified buffer)
+               (minibuffer-y-or-n-p 
+                 (format nil "Save buffer ~A?" (buffer-property buffer 'name)))
+               (buffer-property buffer 'path))
+      (with-open-file (s (buffer-property buffer 'path)
+                         :direction :output
+                         :if-exists :new-version
+                         :if-does-not-exist :create)
+        (do ((line (first-line buffer) (next-line line)))
+            ((not line))
+          (write-sequence (map 'string #'car (data line)) s)
+          (when (next-line line)
+            (terpri s))))
+        (setf (buffer-property buffer 'new-file) nil
+              (buffer-modified buffer) nil)
+        (format t "Wrote ~S~%" (buffer-property buffer 'path)))))
+
 (defun write-file-command ()
   (let* ((buffer (current-buffer *editor*))
          (*default-pathname-defaults* (or (buffer-property buffer 'path)
-                                          (buffer-property buffer 'default-pathname-defaults)))
+                                          (buffer-property buffer 'default-pathname-defaults)
+                                          *default-pathname-defaults*))
          (path (read-from-minibuffer "Write file: " 
                                      (namestring *default-pathname-defaults*)))
          (filespec (merge-pathnames path)))
