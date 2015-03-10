@@ -200,29 +200,6 @@
       (mezzano.gui.compositor:damage-window (window *editor*)
                                             left real-y
                                             win-width line-height))))
-(defun render-modeline (line y)
-  (multiple-value-bind (left right top bottom)
-      (mezzano.gui.widgets:frame-size (frame *editor*))
-    (let* ((fb (mezzano.gui.compositor:window-buffer (window *editor*)))
-           (line-height (mezzano.gui.font:line-height (font *editor*)))
-           (real-y (+ top (* y line-height)))
-           (win-width (editor-width)))
-      (if line
-          ;; Blitting line.
-          (mezzano.gui:bitblt line-height win-width
-                              (display-line-representation line)
-                              0 0
-                              fb
-                              real-y left)
-          ;; Line is empty.
-          (mezzano.gui:bitset line-height win-width
-                              (foreground-colour *editor*)
-                              fb
-                              real-y left))
-      (mezzano.gui.compositor:damage-window (window *editor*)
-                                            left real-y
-                                            win-width line-height))))
-
 
 (defun recenter (buffer)
   "Move BUFFER's top line so that the point is displayed."
@@ -256,14 +233,15 @@
       (setf (mark-line top-line-mark) (display-line-line new-top-line))
             (mark-charpos top-line-mark) (display-line-start new-top-line))))
 
+(defun minibuffer-rows ()
+  (if (eql (current-buffer *editor*) *minibuffer*)
+    (1+ (truncate (line-number (last-line *minibuffer*)) 10000))
+    1))
+
+(defvar *mode-line-buffer* (make-instance 'buffer))
 (defun render-mode-line ()
-  (let* ((buffer (current-buffer *editor*))
-         (minibuffer-rows (if (eql buffer *minibuffer*)
-                            (1+ (truncate (line-number (last-line buffer)) 10000))
-                            1))
-         (modeline-buffer (get-buffer-create " *Modeline*"))
-         (modeline-string (buffer-property buffer 'modeline)))
-    (insert modeline-buffer
+  (let* ((buffer (current-buffer *editor*)))
+    (insert *mode-line-buffer*
       (format nil " [~A] ~A L~S C~S    (~A)" 
          (if (buffer-modified buffer) "*" " ")
          (buffer-property buffer 'name)
@@ -272,9 +250,11 @@
          ;;(buffer-current-package buffer)
          *package* ; TODO: uncomment above when buffer-current-package is faster
          ))
-    (render-display-line (first-line modeline-buffer)
-       (lambda (l) (blit-display-line l (- (window-rows) (1- minibuffer-rows)))) t)
-    (kill-buffer modeline-buffer)))
+    (render-display-line (first-line *mode-line-buffer*)
+       (lambda (l) (blit-display-line l (- (window-rows) (1- (minibuffer-rows))))) t)
+    (let ((point (copy-mark (buffer-point *mode-line-buffer*))))
+      (move-beginning-of-buffer *mode-line-buffer*)
+      (delete-region *mode-line-buffer* point (buffer-point *mode-line-buffer*)))))
 
 (defun redisplay ()
   "Perform an incremental redisplay cycle.
@@ -354,7 +334,7 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
             (return-from redisplay nil))
           ;; Compare against the current screen, blitting when needed.
           (if (eql buffer *minibuffer*)
-            (let ((minibuffer-rows (1+ (truncate (line-number (last-line buffer)) 10000))))
+            (let ((minibuffer-rows (minibuffer-rows)))
               (do ((y 0 (incf y)))
                   ((= y minibuffer-rows))
                 (let ((line (aref new-screen y)))
@@ -370,10 +350,10 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
                     (setf (aref current-screen y) line)
                     (check-pending-input))))
               ;; render the messages line
-          (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
-            (when line
-              (render-display-line line
-                (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
+              (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
+                (when line
+                  (render-display-line line
+                    (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
           (render-mode-line)
           ;; Prune the cache.
           (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
