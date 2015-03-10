@@ -36,6 +36,7 @@ If the compiled file is out of date, recompile and load it."
 (cal "home/med/buffer-stream.lisp")
 (cal "home/med/point.lisp")
 (cal "home/med/minibuffer.lisp")
+(cal "home/med/repl.lisp")
 (cal "home/med/redisplay.lisp")
 (cal "home/med/commands.lisp")
 (cal "home/med/keybindings.lisp")
