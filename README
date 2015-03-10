@@ -12,6 +12,10 @@ TODO:
 
 - why does everything slow to a crawl after some time?
 
+- grep/grep-buffers
+
+- save all editor threads/frames
+
 - copy region rather than kill/yank it
 
 - other frame doesn't refresh when buffer is modified; force redraw on insert?
