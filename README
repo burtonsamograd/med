@@ -10,18 +10,15 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
-- why does everything slow to a crawl after some time?
-
 - grep/grep-buffers
 
 - save all editor threads/frames
-
-- copy region rather than kill/yank it
 
 - other frame doesn't refresh when buffer is modified; force redraw on insert?
   - other frame doesn't close buffers when they are killed in another frame
 
 - minibuffer history (M-p/M-n)
+- get minibuffer to wrap 
 - clear bottom messages after a while
 
 - optimize or cache (memoize?) buffer current package so we can put
