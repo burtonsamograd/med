@@ -10,15 +10,15 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
+- why does everything slow to a crawl after some time?
+
+- copy region rather than kill/yank it
+
 - other frame doesn't refresh when buffer is modified; force redraw on insert?
-- update isearch to use buffer local pre and post command hooks
-- C-x s - save-some-buffers-command
+  - other frame doesn't close buffers when they are killed in another frame
 
 - minibuffer history (M-p/M-n)
 - clear bottom messages after a while
-- multi-line minibuffer
-
-- why does everything slow to a crawl after some time?
 
 - optimize or cache (memoize?) buffer current package so we can put
   the current file package in the modeline properly
