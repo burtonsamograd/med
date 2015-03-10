@@ -526,3 +526,6 @@ If no such form is found, then return the CL-USER package."
 
 (defun new-frame-command ()
   (spawn))
+
+(defun repl-command ()
+  (start-repl))
