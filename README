@@ -14,6 +14,10 @@ TODO:
 - update isearch to use buffer local pre and post command hooks
 - C-x s - save-some-buffers-command
 
+- minibuffer history (M-p/M-n)
+- clear bottom messages after a while
+- multi-line minibuffer
+
 - why does everything slow to a crawl after some time?
 
 - optimize or cache (memoize?) buffer current package so we can put
