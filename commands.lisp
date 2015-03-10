@@ -551,3 +551,6 @@ If no such form is found, then return the CL-USER package."
 
 (defun repl-command ()
   (start-repl))
+
+(defun grep-command ()
+  (grep))
