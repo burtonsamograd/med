@@ -258,6 +258,9 @@
 
 (defun render-mode-line ()
   (let* ((buffer (current-buffer *editor*))
+         (minibuffer-rows (if (eql buffer *minibuffer*)
+                            (1+ (truncate (line-number (last-line buffer)) 10000))
+                            1))
          (modeline-buffer (get-buffer-create " *Modeline*"))
          (modeline-string (buffer-property buffer 'modeline)))
     (insert modeline-buffer
@@ -270,7 +273,7 @@
          *package* ; TODO: uncomment above when buffer-current-package is faster
          ))
     (render-display-line (first-line modeline-buffer)
-       (lambda (l) (blit-display-line l (window-rows))) t)
+       (lambda (l) (blit-display-line l (- (window-rows) (1- minibuffer-rows)))) t)
     (kill-buffer modeline-buffer)))
 
 (defun redisplay ()
@@ -350,14 +353,15 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
             (recenter buffer)
             (return-from redisplay nil))
           ;; Compare against the current screen, blitting when needed.
-          (if (eql (current-buffer *editor*) *minibuffer*)
-            (do ((y 0 (incf y)))
-                ((= y 1))
-            (let ((line (aref new-screen y)))
-              (unless (eql (aref current-screen y) line)
-                (blit-display-line line (+ y (window-rows) 1))
-                (setf (aref current-screen y) line)
-                (check-pending-input))))
+          (if (eql buffer *minibuffer*)
+            (let ((minibuffer-rows (1+ (truncate (line-number (last-line buffer)) 10000))))
+              (do ((y 0 (incf y)))
+                  ((= y minibuffer-rows))
+                (let ((line (aref new-screen y)))
+                  (unless (eql (aref current-screen y) line)
+                    (blit-display-line line (+ y (- (window-rows) minibuffer-rows) 2))
+                    (setf (aref current-screen y) line)
+                    (check-pending-input)))))
             (progn
               (dotimes (y (window-rows))
                 (let ((line (aref new-screen y)))
@@ -370,7 +374,7 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
             (when line
               (render-display-line line
                 (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
-            (render-mode-line)
+          (render-mode-line)
           ;; Prune the cache.
           (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
         t)
