@@ -51,6 +51,15 @@
                ((string-equal line "no")
                 (return nil)))))))
 
+(defun minibuffer-y-or-n-p (&optional control &rest arguments)
+  (let ((prompt (apply 'format nil control arguments)))
+    (loop
+       (let ((line (read-from-minibuffer (format nil "~A (Y or N) " prompt))))
+         (cond ((string-equal line "y")
+                (return t))
+               ((string-equal line "n")
+                (return nil)))))))
+
 (defun initialize-minibuffer-key-map (key-map)
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
   (set-key #\C-M 'minibuffer-finish-input-command key-map)
