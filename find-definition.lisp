@@ -23,11 +23,4 @@
   (find-definition (read-from-string (symbol-at-point (current-buffer *editor*)))))
 
 
-(find-definition (read-from-string (symbol-at-point (current-buffer *editor*))))
-
-
-
-(set-key #\M-FULL_STOP 'find-definition-command (global-key-map))
-
-;(find-definition 'spawn)
 
