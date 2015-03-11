@@ -10,7 +10,9 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
-- grep/grep-buffers
+- grep-buffers
+
+- move-sexp doesn't skip over comments
 
 - save all editor threads/frames
 

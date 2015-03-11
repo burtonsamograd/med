@@ -41,6 +41,7 @@ If the compiled file is out of date, recompile and load it."
 (cal "home/med/keybindings.lisp")
 (cal "home/med/repl.lisp")
 (cal "home/med/grep.lisp")
+(cal "home/med/find-definition.lisp")
 (cal "home/med/main.lisp")
 
 (defun make ()

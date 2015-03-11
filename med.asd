@@ -20,4 +20,5 @@
                (:file "keybindings")
                (:file "minibuffer")
                (:file "repl")
+               (:file "find-definition")
                (:file "main")))

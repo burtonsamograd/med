@@ -11,3 +11,9 @@
     (save-excursion (buffer)
       (move-end-of-buffer buffer)
       (insert buffer char))))
+
+(defmethod sys.gray::stream-write-string ((stream buffer-stream) string)
+  (let ((buffer (get-buffer-create (buffer-stream-buffer-name stream))))
+    (save-excursion (buffer)
+      (move-end-of-buffer buffer)
+      (insert buffer string))))
