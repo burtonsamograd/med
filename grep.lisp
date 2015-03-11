@@ -28,7 +28,8 @@
             ((not line))
           (when (search search-string line)
             (insert buffer (format nil "~A:~A: ~A~%" 
-                                   (file-namestring file) lineno line))))))))
+                                   (file-namestring file) lineno line)))))
+     (setf (buffer-modified buffer) nil))))
 
 (defun grep-find-file-at-point ()
   (let* ((buffer (current-buffer *editor*)))
