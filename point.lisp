@@ -133,29 +133,31 @@ Tries to stay as close to the hint column as possible."
              (cond 
                ((eql (sys.int::readtable-syntax-type ch nil) :whitespace) t)
                ((eql ch #\SEMICOLON) (scan-forward mark (lambda (c) (eql c #\Newline)))
-                                     t))))
+                t))))
       ;; Skip past any leading whitespace.
       (scan-forward mark (complement #'whitespacep))
       (loop
-         (let ((ch (character-right-of mark)))
+         (let ((ch (character-right-of mark))
+               (chl (character-left-of mark)))
            (when (not ch)
              (return nil))
            (when (and (whitespacep ch) (not pair-stack))
              (return t))
-           (cond ((eql ch (first pair-stack))
-                  (pop pair-stack)
-                  (when (not pair-stack)
-                    ;; Found last match, finished.
-                    (move-mark mark 1)
-                    (return t)))
-                 ((eql ch #\))
-                  (if first-char
-                      (error "Unmatched ~C." ch)
+           (unless (eql chl #\\ )
+             (cond ((eql ch (first pair-stack))
+                    (pop pair-stack)
+                    (when (not pair-stack)
+                      ;; Found last match, finished.
+                      (move-mark mark 1)
                       (return t)))
-                 ((eql ch #\")
-                  (push #\" pair-stack))
-                 ((eql ch #\()
-                  (push #\) pair-stack)))
+                   ((eql ch #\))
+                    (if first-char
+                        (error "Unmatched ~C." ch)
+                        (return t)))
+                   ((eql ch #\")
+                    (push #\" pair-stack))
+                   ((eql ch #\()
+                    (push #\) pair-stack))))
            (move-mark mark 1))
          (setf first-char nil)))))
 
