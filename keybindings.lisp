@@ -76,6 +76,6 @@
   (set-key '(#\C-C #\C-K) 'compile-buffer-command key-map)
   (set-key '(#\C-X #\C-E) 'eval-last-sexp-command key-map)
   (set-key #\M-O 'find-matching-paren-command key-map)
-  (set-key #\M-FULL_STOP 'find-symbol-at-point-command key-map))
+  (set-key #\M-FULL_STOP 'find-definition-command key-map))
 
 
