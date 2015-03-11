@@ -94,7 +94,6 @@
                 (format t "Editor error: ~A~%" c)
                 (setf (pending-redisplay *editor*) t))))))))))))
 
-;,(make-instance 'buffer-stream :buffer-name "*Messages*"))
 (defun spawn (&key width height initial-file)
   (mezzano.supervisor:make-thread
     (lambda () (editor-main width height initial-file))
