@@ -130,7 +130,10 @@ Tries to stay as close to the hint column as possible."
   (let ((pair-stack '())
         (first-char t))
     (flet ((whitespacep (ch)
-             (eql (sys.int::readtable-syntax-type ch nil) :whitespace)))
+             (cond 
+               ((eql (sys.int::readtable-syntax-type ch nil) :whitespace) t)
+               ((eql ch #\SEMICOLON) (scan-forward mark (lambda (c) (eql c #\Newline)))
+                                     t))))
       ;; Skip past any leading whitespace.
       (scan-forward mark (complement #'whitespacep))
       (loop
