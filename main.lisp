@@ -1,5 +1,7 @@
 (in-package :med)
 
+;;; testing
+
 (defun translate-command (character)
   "Translate a character to a command."
   (multiple-value-bind (command found-p)
@@ -103,13 +105,14 @@
                                            :title "Editor console"))
                         (*standard-input* ,(make-synonym-stream '*terminal-io*))
                         (*standard-output* ,(make-instance 'buffer-stream 
-                                                        :buffer-name "*Messages*"))
+                                                           :buffer-name "*Messages*"))
                         (*error-output* ,(make-synonym-stream '*terminal-io*))
                         (*trace-output* ,(make-synonym-stream '*terminal-io*))
                         (*debug-io* ,(make-synonym-stream '*terminal-io*))
                         (*query-io* ,(make-synonym-stream '*terminal-io*)))))
 
-#+(or) (defun spawn (&key width height initial-file)
+#+(or)
+(defun spawn (&key width height initial-file)
   (mezzano.supervisor:make-thread (lambda () (editor-main width height initial-file))
                                   :name "Editor"
                                   :initial-bindings `((*terminal-io* ,(make-instance 'mezzano.gui.popup-io-stream:popup-io-stream

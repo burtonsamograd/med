@@ -14,6 +14,7 @@
                (:file "mark")
                (:file "editor")
                (:file "buffer")
+               (:file "save-excursion")
                (:file "point")
                (:file "redisplay")
                (:file "commands")

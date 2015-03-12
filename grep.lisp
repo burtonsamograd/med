@@ -16,6 +16,7 @@
          (files (directory filespec)))
     (setf (buffer-property buffer 'default-pathname-defaults) default-pathname-defaults)
     (setf (buffer-key-map buffer) *grep-key-map*)
+    (setf (last-buffer *editor*) (current-buffer *editor*))
     (switch-to-buffer buffer)
     (move-beginning-of-buffer buffer)
     (let ((point (copy-mark (buffer-point buffer))))

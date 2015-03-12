@@ -97,6 +97,13 @@ Tries to stay as close to the hint column as possible."
             nil)))
         (t (line-character (mark-line mark) (1- (mark-charpos mark))))))
 
+(defun nth-character-left-of (mark nth)
+  (let ((buffer (line-buffer (mark-line mark))))
+    (save-excursion (buffer)
+      (dotimes (i (1- nth))
+        (move-mark mark -1))
+      (character-left-of mark))))
+
 (defun scan (mark predicate jump key)
   (loop
      (let ((ch (funcall key mark)))
@@ -133,31 +140,33 @@ Tries to stay as close to the hint column as possible."
              (cond 
                ((eql (sys.int::readtable-syntax-type ch nil) :whitespace) t)
                ((eql ch #\SEMICOLON) (scan-forward mark (lambda (c) (eql c #\Newline)))
-                t))))
+                                     t))))
       ;; Skip past any leading whitespace.
       (scan-forward mark (complement #'whitespacep))
       (loop
-         (let ((ch (character-right-of mark))
-               (chl (character-left-of mark)))
+         (let* ((ch (character-right-of mark))
+                (chl (character-left-of mark))
+                (chl2 (when (eql chl #\\) (nth-character-left-of mark 2))))
            (when (not ch)
              (return nil))
            (when (and (whitespacep ch) (not pair-stack))
              (return t))
-           (unless (eql chl #\\ )
-             (cond ((eql ch (first pair-stack))
-                    (pop pair-stack)
-                    (when (not pair-stack)
-                      ;; Found last match, finished.
-                      (move-mark mark 1)
-                      (return t)))
-                   ((eql ch #\))
-                    (if first-char
-                        (error "Unmatched ~C." ch)
-                        (return t)))
-                   ((eql ch #\")
-                    (push #\" pair-stack))
-                   ((eql ch #\()
-                    (push #\) pair-stack))))
+           (unless (and (eql chl #\\)
+                        (eql chl2 #\#))
+         (cond ((eql ch (first pair-stack))
+            (pop pair-stack)
+            (when (not pair-stack)
+              ;; Found last match, finished.
+             (move-mark mark 1)
+             (return t)))
+              ((eql ch #\))
+           (if first-char
+             (error "Unmatched ~C." ch)
+             (return t)))
+          ((eql ch #\")
+           (push #\" pair-stack))
+          ((eql ch #\()
+           (push #\) pair-stack))))
            (move-mark mark 1))
          (setf first-char nil)))))
 
@@ -203,7 +212,9 @@ Tries to stay as close to the hint column as possible."
 
 (defun test-fill (buffer)
   (let ((width (1- (truncate (editor-width)
-                             (mezzano.gui.font:glyph-advance (mezzano.gui.font:character-to-glyph (font *editor*) #\M))))))
+                             (mezzano.gui.font:glyph-advance
+                                (mezzano.gui.font:character-to-glyph
+                                  (font *editor*) #\M))))))
     (with-mark (mark point :left)
       (dotimes (i (* (window-rows) 2))
         (dotimes (j width)

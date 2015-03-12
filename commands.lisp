@@ -129,10 +129,11 @@
   (setf path (merge-pathnames path))
   (dolist (buffer (buffer-list))
     (when (equal (buffer-property buffer 'path) path)
+      (setf (last-buffer *editor*) (current-buffer *editor*))
       (switch-to-buffer buffer)
       (setf (buffer-property buffer 'default-pathname-defaults)
             (make-pathname :name nil :type nil :version :newest :defaults path))
-      (return-from find-file)))
+      (return-from find-file buffer)))
   (let ((buffer (make-instance 'buffer)))
     (if (pathname-name path)
       ;; read file
@@ -163,10 +164,12 @@
     (setf (buffer-property buffer 'path) path)
     (move-beginning-of-buffer buffer)
     ;; Loading the file will set the modified flag.
+    (setf (last-buffer *editor*) (current-buffer *editor*))
     (setf (buffer-modified buffer) nil)
     (switch-to-buffer buffer)
     (setf (buffer-property buffer 'default-pathname-defaults)
-          (make-pathname :name nil :type nil :version :newest :defaults path))))
+          (make-pathname :name nil :type nil :version :newest :defaults path))
+    buffer))
 
 (defun find-file-command ()
   (find-file (read-from-minibuffer "Find file: " 
@@ -240,6 +243,7 @@
 
 (defun list-buffers-command ()
   (let ((buffer (get-buffer-create "*Buffers*")))
+    (setf (last-buffer *editor*) (current-buffer *editor*))    
     (switch-to-buffer buffer)
     ;; Clear the whole buffer.
     (delete-region buffer
@@ -323,21 +327,6 @@ A top-level form is designated by an open parenthesis at the start of a line."
        (when (not (previous-line (mark-line point)))
          (error "Can't find start of top-level form."))
        (setf (mark-line point) (previous-line (mark-line point))))))
-
-(defmacro save-excursion ((buffer) &body body)
-  "Save the point & mark in buffer, execute body, then restore the saved point
-and mark."
-  `(call-with-save-excursion ,buffer (lambda () ,@body)))
-
-(defun call-with-save-excursion (buffer fn)
-  (let ((previous-point (copy-mark (buffer-point buffer) :right))
-        (previous-mark (copy-mark (buffer-mark buffer) :left))
-        (previous-mark-active (buffer-mark-active buffer)))
-    (unwind-protect
-         (funcall fn)
-      (move-mark-to-mark (buffer-point buffer) previous-point)
-      (move-mark-to-mark (buffer-mark buffer) previous-mark)
-      (setf (buffer-mark-active buffer) previous-mark-active))))
 
 (defun symbol-at-point (buffer)
   (save-excursion (buffer)

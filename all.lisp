@@ -32,6 +32,7 @@ If the compiled file is out of date, recompile and load it."
 (cal "home/med/line.lisp")
 (cal "home/med/mark.lisp")
 (cal "home/med/editor.lisp")
+(cal "home/med/save-excursion.lisp")
 (cal "home/med/buffer.lisp")
 (cal "home/med/buffer-stream.lisp")
 (cal "home/med/point.lisp")

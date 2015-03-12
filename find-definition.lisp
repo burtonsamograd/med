@@ -3,25 +3,28 @@
 (defvar *mark-stack* ())
 
 (defun function-source-file (function-symbol)
-   (read-from-string 
-     (sixth (sys.int::function-pool-object (symbol-function function-symbol) 1))))
+  (let ((string (sixth (sys.int::function-pool-object
+                         (symbol-function function-symbol) 1))))
+    (if (eql (char string 0) #\#)
+      (read-from-string string) ; convert pathname
+      (pathname string))))
 
 (defun function-top-level-form-number (function-symbol)
    (seventh (sys.int::function-pool-object (symbol-function function-symbol) 1)))
 
 (defun find-definition (function-symbol)
-  (let ((file (function-source-file function-symbol))
-        (form (function-top-level-form-number function-symbol)))
-    (find-file file)
-    (let* ((buffer (current-buffer *editor*))
-           (*package* (buffer-current-package buffer)))
-      (move-beginning-of-buffer buffer)
-      (dotimes (i (1+ form))
-        (move-sexp buffer))
-    (move-sexp buffer -1))))
+  (let* ((buffer (current-buffer *editor*))
+         (*package* (buffer-current-package buffer)))
+    (let ((file (function-source-file function-symbol))
+          (form (function-top-level-form-number function-symbol)))
+      (if (and file form) 
+        (progn
+          (format t "~A ~A ~A ~A~%" buffer *package* file form)
+          (let ((buffer (find-file file)))
+            (move-beginning-of-buffer buffer)
+            (move-sexp buffer (1+ form))
+            (move-sexp buffer -1))
+        (format t "Cannot find definition for function ~A" function-symbol))))))
 
 (defun find-definition-command ()
   (find-definition (read-from-string (symbol-at-point (current-buffer *editor*)))))
-
-
-
