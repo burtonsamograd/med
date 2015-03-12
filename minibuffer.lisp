@@ -1,6 +1,8 @@
 (in-package :med)
 
 ;;; Minibuffer stuff.
+(defvar *minibuffer-history* '())
+(defvar *minibuffer-history-number* 0)
 
 (defun fix-minibuffer-point-position-hook ()
   (when (mark< (buffer-point *minibuffer*)
@@ -14,10 +16,22 @@
 
 (defun minibuffer-finish-input-command ()
   (move-end-of-buffer *minibuffer*)
-  (throw 'minibuffer-result
-    (buffer-string *minibuffer*
+  (let ((string (buffer-string *minibuffer*
+                               (buffer-property *minibuffer* 'minibuffer-prompt-end)
+                               (buffer-point *minibuffer*))))
+  (when (> (length string) 0)
+    (push string *minibuffer-history*))
+  (setf *minibuffer-history-number 0)
+  (throw 'minibuffer-result string)))
+
+(defun minibuffer-previous-history-command ()
+  (when (< *minibuffer-history-number* (length *minibuffer-history*))
+    (move-end-of-line *minibuffer*)
+    (delete-region *minibuffer*
                    (buffer-property *minibuffer* 'minibuffer-prompt-end)
-                   (buffer-point *minibuffer*))))
+                   (buffer-point *minibuffer*))
+    (insert *minibuffer* (nth *minibuffer-history-number* *minibuffer-history*))
+    (incf *minibuffer-history-number*)))
 
 (defun read-from-minibuffer (prompt &optional default-text)
   "Read a string from the minibuffer."
@@ -35,11 +49,16 @@
            (insert *minibuffer* prompt)
            (setf (buffer-property *minibuffer* 'minibuffer-prompt-end) 
                                   (copy-mark (buffer-point *minibuffer*) :left))
+
            (when default-text
              (insert *minibuffer* default-text))
            (catch 'minibuffer-result
-             (editor-loop)))
-      (switch-to-buffer old-buffer))))
+             (handler-case
+              (editor-loop)
+              (error (e) 
+                (setf *minibuffer-history-number* 0)
+                (error e)))))
+      (switch-to-buffer old-buffer))))x
 
 
 (defun minibuffer-yes-or-no-p (&optional control &rest arguments)
@@ -63,6 +82,7 @@
 (defun initialize-minibuffer-key-map (key-map)
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
   (set-key #\C-M 'minibuffer-finish-input-command key-map)
+  (set-key #\M-P 'minibuffer-previous-history-command key-map)
   (set-key '(#\C-X #\C-F) nil key-map)
   (set-key '(#\C-X #\C-S) nil key-map)
   (set-key '(#\C-X #\C-W) nil key-map)
