@@ -24,13 +24,21 @@
   (setf *minibuffer-history-number 0)
   (throw 'minibuffer-result string)))
 
+(defun replace-minibuffer-string (string)
+  (move-end-of-line *minibuffer*)
+  (delete-region *minibuffer*
+		 (buffer-property *minibuffer* 'minibuffer-prompt-end)
+		 (buffer-point *minibuffer*))
+  (insert *minibuffer* string))
+
 (defun minibuffer-previous-history-command ()
   (when (< *minibuffer-history-number* (length *minibuffer-history*))
-    (move-end-of-line *minibuffer*)
-    (delete-region *minibuffer*
-                   (buffer-property *minibuffer* 'minibuffer-prompt-end)
-                   (buffer-point *minibuffer*))
-    (insert *minibuffer* (nth *minibuffer-history-number* *minibuffer-history*))
+    (replace-minibuffer-string (nth *minibuffer-history-number* *minibuffer-history*))
+    (incf *minibuffer-history-number*)))
+
+(defun minibuffer-next-history-command ()
+  (when (< *minibuffer-history-number* (length *minibuffer-history*))
+    (replace-minibuffer-string (nth *minibuffer-history-number* *minibuffer-history*))
     (incf *minibuffer-history-number*)))
 
 (defun read-from-minibuffer (prompt &optional default-text)
@@ -83,6 +91,7 @@
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
   (set-key #\C-M 'minibuffer-finish-input-command key-map)
   (set-key #\M-P 'minibuffer-previous-history-command key-map)
+  (set-key #\M-N 'minibuffer-next-history-command key-map)
   (set-key '(#\C-X #\C-F) nil key-map)
   (set-key '(#\C-X #\C-S) nil key-map)
   (set-key '(#\C-X #\C-W) nil key-map)
