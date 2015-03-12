@@ -12,14 +12,11 @@ TODO:
 
 - grep-buffers
 
-- move-sexp doesn't skip over comments
-
 - save all editor threads/frames
 
 - other frame doesn't refresh when buffer is modified; force redraw on insert?
   - other frame doesn't close buffers when they are killed in another frame
 
-- minibuffer history (M-p/M-n)
 - get minibuffer to wrap 
 - clear bottom messages after a while
 
