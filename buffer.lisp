@@ -35,6 +35,10 @@
           (slot-value instance '%point) (make-mark line 0 :right)
           (slot-value instance '%mark) (make-mark line 0 :left))))
 
+(defmethod print-object ((object buffer) stream)
+  (print-unreadable-object (object stream :type t :identity t)
+    (format stream "~S" (buffer-property object 'name))))
+
 ;;; Sub-editor. Buffer manipulation.
 
 (defun buffer-modified (buffer)
