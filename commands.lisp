@@ -420,16 +420,6 @@ If no such form is found, then return the CL-USER package."
   (let ((buffer (current-buffer *editor*)))
     (copy-region buffer (buffer-point buffer) (buffer-mark buffer))))
 
-(defun compile-buffer-command ()
-  (let* ((buffer (current-buffer *editor*))
-         (path (buffer-property buffer 'path)))
-    (save-buffer-command)
-    (format t "Background compiling ~A~%" path)
-    (mezzano.supervisor::make-thread (lambda () (cal path))
-       :name "MED Compilation"
-       :initial-bindings `((*standard-output* ,(make-instance 'buffer-stream 
-                                                              :buffer-name "*compilation*"))))))
-
 (defun eval-last-sexp-command ()
    (let* ((buffer (current-buffer *editor*))
           (point (copy-mark (buffer-point buffer))))

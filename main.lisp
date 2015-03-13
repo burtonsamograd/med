@@ -82,8 +82,7 @@
                                                  top bottom)))
     (switch-to-buffer (get-buffer-create "*scratch*"))
     (let ((buffer (get-buffer-create "*Messages*")))
-      (insert buffer "Welcome to the Mezzano EDitor. Happy Hacking!")
-      (insert buffer #\Newline))
+      (format t "Welcome to the Mezzano EDitor. Happy Hacking!~%")
       (ignore-errors
         (when initial-file
           (find-file initial-file)))
@@ -94,9 +93,12 @@
               (error (c)
               (ignore-errors
                 (format t "Editor error: ~A~%" c)
-                (setf (pending-redisplay *editor*) t))))))))))))
+                (setf (pending-redisplay *editor*) t)))))))))))))
 
+(defvar *messages* (make-instance 'buffer))
 (defun spawn (&key width height initial-file)
+  (pushnew *messages* (buffer-list))
+  (setf (buffer-property *messages* 'name) "*Messages*")
   (mezzano.supervisor:make-thread
     (lambda () (editor-main width height initial-file))
     :name "Editor"
@@ -105,7 +107,7 @@
                                            :title "Editor console"))
                         (*standard-input* ,(make-synonym-stream '*terminal-io*))
                         (*standard-output* ,(make-instance 'buffer-stream 
-                                                           :buffer-name "*Messages*"))
+                                                           :buffer *messages*))
                         (*error-output* ,(make-synonym-stream '*terminal-io*))
                         (*trace-output* ,(make-synonym-stream '*terminal-io*))
                         (*debug-io* ,(make-synonym-stream '*terminal-io*))

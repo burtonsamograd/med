@@ -37,9 +37,9 @@
     (incf *minibuffer-history-number*)))
 
 (defun minibuffer-next-history-command ()
-  (when (< *minibuffer-history-number* (length *minibuffer-history*))
-    (replace-minibuffer-string (nth *minibuffer-history-number* *minibuffer-history*))
-    (incf *minibuffer-history-number*)))
+  (when (> *minibuffer-history-number* 0)
+    (decf *minibuffer-history-number*)
+    (replace-minibuffer-string (nth *minibuffer-history-number* *minibuffer-history*))))
 
 (defun read-from-minibuffer (prompt &optional default-text)
   "Read a string from the minibuffer."

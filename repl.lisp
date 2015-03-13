@@ -25,7 +25,7 @@
 (defun repl-eval (code)
   (if (string= code "")
        ""
-       (let ((s (make-instance 'buffer-stream :buffer-name "*repl*")))
+       (let ((s (make-instance 'buffer-stream :buffer (get-buffer "*repl*"))))
          (handler-case
            (let ((*standard-output* s))
              (format s "~%~S" (eval (read-from-string code))))

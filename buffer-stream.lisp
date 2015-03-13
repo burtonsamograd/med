@@ -1,21 +1,13 @@
 (in-package :med)
 
 (defclass buffer-stream (sys.gray::fundamental-character-output-stream)
-  ((buffer :initarg :buffer-name :reader buffer-stream-buffer-name)))
+  ((buffer :initarg :buffer :reader buffer-stream-buffer)))
 
 (defmethod sys.gray::stream-line-column ((stream buffer-stream))
   (sys.gray::col-index-of stream))
 
 (defmethod sys.gray::stream-write-char ((stream buffer-stream) char)
-  (let ((buffer (get-buffer-create (buffer-stream-buffer-name stream))))
+  (let ((buffer (buffer-stream-buffer stream)))
     (save-excursion (buffer)
       (move-end-of-buffer buffer)
-      (insert buffer char))
-  (redisplay)))
-
-(defmethod sys.gray::stream-write-string ((stream buffer-stream) string)
-  (let ((buffer (get-buffer-create (buffer-stream-buffer-name stream))))
-    (save-excursion (buffer)
-      (move-end-of-buffer buffer)
-      (insert buffer string))
-  (redisplay)))
+      (insert buffer char))))
