@@ -324,7 +324,9 @@ then merge the current line and next line."
           (move-end-of-line buffer))
       (unwind-protect
            (kill-region buffer here point)
-        (point-to-mark buffer here))))
+        (unwind-protect
+          (point-to-mark buffer here)
+          t))))
   (values))
 
 (defun delete-char (buffer &optional (n 1))

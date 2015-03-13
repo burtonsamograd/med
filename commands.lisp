@@ -297,7 +297,9 @@
     (switch-to-buffer
      (if (buffer-list)
          (first (buffer-list))
-         (get-buffer-create "*Scratch*")))))
+         (get-buffer-create "*Scratch*")))
+    (when (>= (length (buffer-list)) 2)
+       (setf (last-buffer *editor*) (second (buffer-list))))))
 
 (defun unique-name (name &optional version)
   (let ((actual-name (if version
