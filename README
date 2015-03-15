@@ -10,9 +10,11 @@ Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
 
-- multiple windows
+- telnet
 
-- buffer-streams are very slow and cause the program to hang all the time :-/
+- multiple windows
+  - might just put this in a window manager
+  - need resizeable windows
 
 - grep-buffers
 
@@ -20,6 +22,8 @@ TODO:
 
 - other frame doesn't refresh when buffer is modified; force redraw on insert?
   - other frame doesn't close buffers when they are killed in another frame
+  - new event, force refresh can be sent to all threads to cause refresh for 
+    multiple windows
 
 - get minibuffer to wrap 
 - clear bottom messages after a while
@@ -30,6 +34,7 @@ TODO:
 - hang when yanking, sometimes...
 
 - isearch
+  - don't set buffer-modified when isearching
   - When typing wrong characters in isearch they are appended to the *isearch-string*. 
     They should be just discarded 
   - Show current search string in minibuffer
