@@ -19,6 +19,9 @@
       (setf buffer (make-instance 'buffer
                                   :key-map *repl-key-map*)
             (buffer-property buffer 'name) "*repl*"
+            (buffer-property buffer 'default-pathname-defaults)
+              (or (buffer-property (current-buffer *editor*) 'default-pathname-defaults)
+                  *default-pathname-defaults*)
             (last-buffer *editor*) (current-buffer *editor*))
       (repl-prompt buffer)
       (push buffer (buffer-list)))
@@ -30,7 +33,9 @@
        ""
        (let* ((s (make-instance 'buffer-stream :buffer (get-buffer "*repl*")))
               (*standard-output* s)
-              (*error-output* s))
+              (*error-output* s)
+              (*default-pathname-defaults* (buffer-property (get-buffer "*repl*")
+                                                            'default-pathname-defaults)))
          (handler-case
              (format t "~S" (eval (read-from-string code)))
              (error (e) (format t "~S~%" e) ""))
@@ -174,4 +179,5 @@
   (set-key #\Backspace 'repl-delete-backward-char *repl-key-map*)
   (set-key #\Tab 'repl-complete *repl-key-map*)
   (set-key #\M-O 'repl-find-matching-paren *repl-key-map*)  
+  (set-key #\Comma 'cd-command *repl-key-map*)  
 )
