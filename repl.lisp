@@ -28,21 +28,27 @@
 (defun repl-eval (code)
   (if (string= code "")
        ""
-       (let ((s (make-instance 'buffer-stream :buffer (get-buffer "*repl*"))))
+       (let* ((s (make-instance 'buffer-stream :buffer (get-buffer "*repl*")))
+              (*standard-output* s)
+              (*error-output* s))
          (handler-case
-           (let ((*standard-output* s))
-             (format s "~%~S" (eval (read-from-string code))))
-             (error (e) (format s "~%~S~%" e) "")))))
+             (format t "~S" (eval (read-from-string code)))
+             (error (e) (format t "~S~%" e) ""))
+            (finish-output))))
 
 (defun repl-finish-input-command ()
   (let ((buffer (current-buffer *editor*)))
     (move-end-of-line buffer)
+    (insert buffer #\Newline)
+    (setf (buffer-property buffer 'repl-output-start) (copy-mark (buffer-point buffer)))
     ;; FIXME: clearing the buffer by cutting the text causes the 
     ;; editor to crash when you hit enter
     (let ((code (buffer-string buffer
                                (buffer-property buffer 'repl-prompt-end)
                                (buffer-point buffer))))
-      (mezzano.supervisor::make-thread (lambda () (repl-eval code) (repl-prompt buffer))  
+      (mezzano.supervisor::make-thread (lambda () 
+                                         (repl-eval code)
+                                         (repl-prompt buffer))
                                        :name "repl"
                                        :initial-bindings `((*editor* ,*editor*)))
       (when (and (> (length code) 0)
@@ -151,6 +157,12 @@
                 (move-mark (buffer-point buffer) i)
                 (return))))))))
 
+(defun repl-delete-backward-char ()
+  (let ((buffer (get-buffer "*repl*")))
+    (when (mark< (buffer-property buffer 'repl-prompt-end) 
+                 (buffer-point buffer))
+      (delete-char (get-buffer "*repl*") -1))))
+
 (defun initialize-repl-key-map ()
   (setf *repl-key-map* (make-hash-table))
   (set-key #\C-M 'repl-finish-input-command *repl-key-map*)
@@ -159,6 +171,7 @@
   (set-key #\M-P 'repl-previous-history *repl-key-map*)
   (set-key #\M-N 'repl-next-history *repl-key-map*)
   (set-key #\C-A 'repl-beginning-of-line *repl-key-map*)
+  (set-key #\Backspace 'repl-delete-backward-char *repl-key-map*)
   (set-key #\Tab 'repl-complete *repl-key-map*)
   (set-key #\M-O 'repl-find-matching-paren *repl-key-map*)  
 )
