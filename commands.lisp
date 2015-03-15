@@ -398,6 +398,7 @@ If no such form is found, then return the CL-USER package."
 ;        (format t "Read ~S in package ~S~%" str package)
         (let ((form (let ((*package* package))
                       (read-from-string str))))
+          (save-buffer-command) ;; FIXME: for now, since we're a bit unstable
           (format t "Evaluated ~S~%" (cadr form))
           (eval form))))))
 
@@ -539,3 +540,11 @@ If no such form is found, then return the CL-USER package."
 
 (defun grep-command ()
   (grep))
+
+(defun cd-command ()
+  (let* ((buffer (current-buffer *editor*))
+         (dir (read-from-minibuffer "Directory: " 
+                                    (namestring 
+                                      (buffer-property buffer 
+                                                       'default-pathname-defaults)))))
+    (setf (buffer-property buffer 'default-pathname-defaults) (pathname dir))))
