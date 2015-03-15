@@ -112,7 +112,7 @@
 (defun repl-find-matching-paren ()
   "Jump the cursor the paren that matches the one under the cursor."
   ;; FIXME: skip parens in strings
-  (with-mark (point (current-bufer *editor*))
+  (with-mark (point (current-buffer *editor*))
     (let* ((buffer (current-buffer *editor*))
            (c (line-character (mark-line point) (mark-charpos point))))
       (when (char= c #\))
