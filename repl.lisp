@@ -7,6 +7,7 @@
 (defun repl-prompt (buffer)
    (move-end-of-buffer buffer)
    (insert buffer (format nil "~A> " (sys.int::package-shortest-name *package*)))
+   (delete-mark (buffer-property buffer 'repl-prompt-end))
    (setf (buffer-property buffer 'repl-prompt-end) (copy-mark (buffer-point buffer))))
 
 (defun start-repl ()
