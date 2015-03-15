@@ -331,7 +331,8 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
             (return)))))
       (setf (fill-pointer new-screen) (window-rows))
       ;; If the point is not within the screen bounds, then recenter and retry.
-      (when (not point-line)
+      (when (and (eql *current-editor* *editor*)
+                 (not point-line))
         (recenter buffer)
         (return-from redisplay nil))
       ;; Compare against the current screen, blitting when needed.
@@ -351,7 +352,7 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
         (blit-display-line line y)
         (setf (aref current-screen y) line)
         (check-pending-input))))
-        ;; render the messages line
+        ;; render the messages line TODO: long message line output
         (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
           (when line
           (render-display-line line
@@ -368,5 +369,8 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
 (defmethod dispatch-event (editor (event force-redisplay))
   (setf (pending-redisplay editor) t))
 
+(defparameter *force-redisplay-event* (make-instance 'force-redisplay))
+
 (defun force-redisplay ()
-  (mezzano.supervisor::fifo-push (make-instance 'force-redisplay) (fifo *editor*)))
+  (dolist (editor *editors*)
+    (mezzano.supervisor::fifo-push *force-redisplay-event* (fifo editor))))

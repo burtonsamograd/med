@@ -14,9 +14,10 @@
   (flet ((call-command (command)
            (let ((buffer (current-buffer *editor*)))
              (mapc 'funcall (buffer-pre-command-hooks buffer))
-             (funcall *this-command*)
+             (funcall command)
              (mapc 'funcall (buffer-post-command-hooks buffer)))))
   (loop
+     (force-redisplay)
      (let* ((*this-character* (editor-read-char))
             (*this-chord* (list *this-character*))
             (*this-command* (translate-command *this-character*)))
@@ -37,7 +38,11 @@
        (setf *last-command* *this-command*
              *last-character* *this-character*
              *last-chord* *this-chord*)
+       (setf *current-editor* *editor*)
        (setf (pending-redisplay *editor*) (not (redisplay)))))))
+
+(defvar *editors* ())
+(defvar *current-editor*)
 
 (defun editor-main (width height initial-file)
   (mezzano.gui.font:with-font (font mezzano.gui.font:*default-monospace-font* mezzano.gui.font:*default-monospace-font-size*)
@@ -80,6 +85,7 @@
                                                  left right)
                                               (- (mezzano.gui.compositor:height window) 
                                                  top bottom)))
+    (push *editor* *editors*)
     (switch-to-buffer (get-buffer-create "*scratch*"))
     (let ((buffer (get-buffer-create "*Messages*")))
       (format t "Welcome to the Mezzano EDitor. Happy Hacking!~%")
@@ -93,7 +99,8 @@
               (error (c)
               (ignore-errors
                 (format t "Editor error: ~A~%" c)
-                (setf (pending-redisplay *editor*) t)))))))))))))
+                (setf (pending-redisplay *editor*) t))))))
+        (setf *editors* (remove *editor* *editors*)))))))))
 
 (defvar *messages* (make-instance 'buffer))
 (defun spawn (&key width height initial-file)
