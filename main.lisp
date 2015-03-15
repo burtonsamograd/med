@@ -42,7 +42,7 @@
        (setf (pending-redisplay *editor*) (not (redisplay)))))))
 
 (defvar *editors* ())
-(defvar *current-editor*)
+(defvar *current-editor* ())
 
 (defun editor-main (width height initial-file)
   (mezzano.gui.font:with-font (font mezzano.gui.font:*default-monospace-font* mezzano.gui.font:*default-monospace-font-size*)
