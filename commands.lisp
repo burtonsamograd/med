@@ -548,3 +548,11 @@ If no such form is found, then return the CL-USER package."
                                       (buffer-property buffer 
                                                        'default-pathname-defaults)))))
     (setf (buffer-property buffer 'default-pathname-defaults) (pathname dir))))
+
+(defun compile-buffer-command ()
+  (save-buffer-command)
+  (mezzano.supervisor::make-thread
+    (lambda () (cal (buffer-property (current-buffer *editor*) 'path)))
+    :name "compile-file"
+    :initial-bindings `((*editor* ,*editor*) 
+                        (*standard-output* ,*standard-output*))))
