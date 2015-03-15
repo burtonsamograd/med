@@ -16,7 +16,8 @@ If the compiled file is out of date, recompile and load it."
               (<= (file-write-date compiled) (file-write-date path)))
       (format t "; Compiling ~S~%" path)
       (ignore-errors (delete-file compiled))
-      (compile-file path))
+      (let ((*standard-output* (make-broadcast-stream)))
+        (compile-file path)))
     (format t "; Loading ~S~%" compiled)
     (load compiled)))
 
@@ -28,6 +29,14 @@ If the compiled file is out of date, recompile and load it."
            (awhen (find-restart 'continue)
              (invoke-restart it)))))
      (cal-1 file)))
+
+(defun make ()
+  (let ((start-time (get-universal-time)))
+     (cal "home/med/all.lisp")
+     (format t "Total build time: ~A seconds.~%" (- (get-universal-time) start-time))))
+
+(defun clean ()
+  (dolist (f (directory "home/med/*.llf")) (delete-file f)))
 
 (cal "home/med/line.lisp")
 (cal "home/med/mark.lisp")
@@ -45,5 +54,4 @@ If the compiled file is out of date, recompile and load it."
 (cal "home/med/find-definition.lisp")
 (cal "home/med/main.lisp")
 
-(defun make ()
-   (cal "home/med/all.lisp"))
+

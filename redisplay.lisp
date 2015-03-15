@@ -252,7 +252,7 @@
          ))
     (render-display-line (first-line *mode-line-buffer*)
        (lambda (l) (blit-display-line l (- (window-rows) (1- (minibuffer-rows))))) t)
-    (let ((point (copy-mark (buffer-point *mode-line-buffer*))))
+    (with-mark (point (buffer-point *mode-line-buffer*))
       (move-beginning-of-buffer *mode-line-buffer*)
       (delete-region *mode-line-buffer* point (buffer-point *mode-line-buffer*)))))
 

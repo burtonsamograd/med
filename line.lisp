@@ -12,7 +12,7 @@
    (%buffer :initarg :buffer :accessor line-buffer))
   (:default-initargs :next nil
                      :prev nil
-                     :data (make-array 50 :element-type 'cons :adjustable t :fill-pointer 0)
+                     :data (make-array 0 :element-type 'cons :adjustable t :fill-pointer 0)
                      :version 0
                      :number 0
                      :mark-list '()

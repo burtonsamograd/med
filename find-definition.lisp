@@ -5,16 +5,16 @@
 (defun function-source-file (function-symbol)
   (let ((string (sixth (sys.int::function-pool-object
                          (symbol-function function-symbol) 1))))
-    (if (eql (char string 0) #\#)
-      (read-from-string string) ; convert pathname
-      (pathname string))))
+    (when string
+      (if (eql (char string 0) #\#)
+        (read-from-string string) ; convert pathname
+        (pathname string)))))
 
 (defun function-top-level-form-number (function-symbol)
    (seventh (sys.int::function-pool-object (symbol-function function-symbol) 1)))
 
 (defun find-definition (function-symbol)
-  (let* ((buffer (current-buffer *editor*))
-         (*package* (buffer-current-package buffer)))
+  (let* ((buffer (current-buffer *editor*)))
     (let ((file (function-source-file function-symbol))
           (form (function-top-level-form-number function-symbol)))
       (if (and file form) 

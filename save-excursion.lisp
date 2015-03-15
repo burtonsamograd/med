@@ -14,5 +14,7 @@ and mark."
          (funcall fn)
       (move-mark-to-mark (buffer-point buffer) previous-point)
       (move-mark-to-mark (buffer-mark buffer) previous-mark)
-      (setf (buffer-mark-active buffer) previous-mark-active))))
+      (setf (buffer-mark-active buffer) previous-mark-active)
+      (delete-mark previous-point)
+      (delete-mark previous-mark))))
 
