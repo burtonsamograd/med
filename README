@@ -9,6 +9,16 @@ file it was written in into smaller ones for easier development.
 Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
+
+- minibuffer completion
+  - pass in completion function to read-from-minibuffer
+    - takes a string
+    - returns a list of strings that are completions of that string
+      - file-completion
+      - symbol-completion
+      - buffer-completion
+      - command-completion
+
 - telnet
 
 - irc client
