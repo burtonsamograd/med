@@ -5,8 +5,8 @@
 
 (defmethod sys.gray::stream-advance-to-column ((stream buffer-stream) column)
    (let ((buffer (buffer-stream-buffer buffer-stream))
-        (line (point-line (buffer-point buffer))))
-     (setf (line-charpos line) column)))
+        (line (point-line (buffer-point buffer))))))
+;     (setf (line-charpos line) column)))
 
 (defmethod sys.gray::stream-line-column ((stream buffer-stream))
    (let ((buffer (buffer-stream-buffer buffer-stream))
@@ -42,7 +42,7 @@
     (save-excursion (buffer)
       (move-end-of-buffer buffer)
       (insert buffer char))
-    (setf (pending-redisplay *editor*) t)))
+    (force-redisplay)))
 
 (defmethod sys.gray::stream-write-string ((stream buffer-stream) string)
   (let ((buffer (buffer-stream-buffer stream)))

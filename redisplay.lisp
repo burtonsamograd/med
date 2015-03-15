@@ -360,3 +360,11 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
         t)
     (pending-input ()
       nil)))
+
+(defclass force-redisplay () ())
+
+(defmethod dispatch-event (editor (event force-redisplay))
+  (setf (pending-redisplay editor) t))
+
+(defun force-redisplay ()
+  (mezzano.supervisor::fifo-push (make-instance 'force-redisplay) (fifo *editor*)))

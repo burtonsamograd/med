@@ -6,7 +6,7 @@
 
 (defun repl-prompt (buffer)
    (move-end-of-buffer buffer)
-   (insert buffer (format nil "~A> " (sys.int::package-shortest-name *package*)))
+   (insert buffer (format nil "~%~A> " (sys.int::package-shortest-name *package*)))
    (when (buffer-property buffer 'repl-prompt-end)
      (delete-mark (buffer-property buffer 'repl-prompt-end)))
    (setf (buffer-property buffer 'repl-prompt-end) (copy-mark (buffer-point buffer))))
@@ -41,12 +41,13 @@
     (let ((code (buffer-string buffer
                                (buffer-property buffer 'repl-prompt-end)
                                (buffer-point buffer))))
-      (repl-eval code)
+      (mezzano.supervisor::make-thread (lambda () (repl-eval code) (repl-prompt buffer))  
+                                       :name "repl"
+                                       :initial-bindings `((*editor* ,*editor*)))
       (when (and (> (length code) 0)
                  (not (string= code (car *repl-history*))))
         (push code *repl-history*))
       (insert buffer #\Newline)
-      (repl-prompt buffer)
       (setf *repl-history-number* 0))))
 
 (defun repl-clear-output ()
