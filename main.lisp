@@ -85,10 +85,11 @@
                                                  left right)
                                               (- (mezzano.gui.compositor:height window) 
                                                  top bottom)))
-    (push *editor* *editors*)
     (switch-to-buffer (get-buffer-create "*scratch*"))
     (let ((buffer (get-buffer-create "*Messages*")))
-      (format t "Welcome to the Mezzano EDitor. Happy Hacking!~%")
+      (unless *editors*
+        (format t "Welcome to the Mezzano EDitor. Happy Hacking!~%"))
+      (push *editor* *editors*)
       (ignore-errors
         (when initial-file
           (find-file initial-file)))

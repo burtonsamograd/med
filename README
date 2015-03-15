@@ -9,7 +9,6 @@ file it was written in into smaller ones for easier development.
 Original Mezzano editor.lisp code written by Henry Harrington.
 
 TODO:
-
 - telnet
 
 - irc client
@@ -36,10 +35,8 @@ TODO:
 - hang when yanking, sometimes...
 
 - isearch
-  - don't set buffer-modified when isearching
   - When typing wrong characters in isearch they are appended to the *isearch-string*. 
     They should be just discarded 
-  - Show current search string in minibuffer
 
 - replace-string, query-replace, replace-regexp
 - search for regex
