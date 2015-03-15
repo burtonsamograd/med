@@ -241,20 +241,21 @@
 (defvar *mode-line-buffer* (make-instance 'buffer))
 (defun render-mode-line ()
   (let* ((buffer (current-buffer *editor*)))
-    (insert *mode-line-buffer*
-      (format nil " [~A] ~A L~S C~S    (~A)" 
-         (if (buffer-modified buffer) "*" " ")
-         (buffer-property buffer 'name)
-         (1+ (truncate (line-number (mark-line (buffer-point buffer))) 10000))
-         (1+ (mark-charpos (buffer-point buffer)))
-         ;;(buffer-current-package buffer)
-         *package* ; TODO: uncomment above when buffer-current-package is faster
-         ))
-    (render-display-line (first-line *mode-line-buffer*)
-       (lambda (l) (blit-display-line l (- (window-rows) (1- (minibuffer-rows))))) t)
-    (with-mark (point (buffer-point *mode-line-buffer*))
-      (move-beginning-of-buffer *mode-line-buffer*)
-      (delete-region *mode-line-buffer* point (buffer-point *mode-line-buffer*)))))
+    (unless (eql buffer *minibuffer*)
+      (insert *mode-line-buffer*
+        (format nil " [~A] ~A L~S C~S    (~A)" 
+           (if (buffer-modified buffer) "*" " ")
+           (buffer-property buffer 'name)
+           (1+ (truncate (line-number (mark-line (buffer-point buffer))) 10000))
+           (1+ (mark-charpos (buffer-point buffer)))
+           ;;(buffer-current-package buffer)
+           *package* ; TODO: uncomment above when buffer-current-package is faster
+           ))
+      (render-display-line (first-line *mode-line-buffer*)
+         (lambda (l) (blit-display-line l (- (window-rows) (1- (minibuffer-rows))))) t)
+      (with-mark (point (buffer-point *mode-line-buffer*))
+        (move-beginning-of-buffer *mode-line-buffer*)
+        (delete-region *mode-line-buffer* point (buffer-point *mode-line-buffer*))))))
 
 (defun redisplay ()
   "Perform an incremental redisplay cycle.
