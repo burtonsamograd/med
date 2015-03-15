@@ -9,17 +9,4 @@
   :version "0.1"
   :description "med - Mezzano EDitor"
   :serial t
-  :components ((:file "package")
-               (:file "line")
-               (:file "mark")
-               (:file "editor")
-               (:file "buffer")
-               (:file "save-excursion")
-               (:file "point")
-               (:file "redisplay")
-               (:file "commands")
-               (:file "keybindings")
-               (:file "minibuffer")
-               (:file "repl")
-               (:file "find-definition")
-               (:file "main")))
+  :components ((:file "all")))
