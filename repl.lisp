@@ -44,21 +44,21 @@
 (defun repl-finish-input-command ()
   (let ((buffer (current-buffer *editor*)))
     (move-end-of-line buffer)
-    (insert buffer #\Newline)
     (setf (buffer-property buffer 'repl-output-start) (copy-mark (buffer-point buffer)))
     ;; FIXME: clearing the buffer by cutting the text causes the 
     ;; editor to crash when you hit enter
     (let ((code (buffer-string buffer
                                (buffer-property buffer 'repl-prompt-end)
                                (buffer-point buffer))))
+      (when (and (> (length code) 0)
+                 (not (string= code (car *repl-history*))))
+        (push code *repl-history*))
+      (insert buffer #\Newline)
       (mezzano.supervisor::make-thread (lambda () 
                                          (repl-eval code)
                                          (repl-prompt buffer))
                                        :name "repl"
                                        :initial-bindings `((*editor* ,*editor*)))
-      (when (and (> (length code) 0)
-                 (not (string= code (car *repl-history*))))
-        (push code *repl-history*))
       (setf *repl-history-number* 0))))
 
 (defun repl-clear-output ()
