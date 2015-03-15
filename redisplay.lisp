@@ -273,91 +273,92 @@ Returns true when the screen is up-to-date, false if the screen is dirty and the
                (previous-point-position (buffer-property buffer 'pane-previous-point-position))
                (mark (buffer-mark buffer))
                (previous-mark-position (buffer-property buffer 'pane-previous-mark-position)))
-          (when (not previous-point-position)
-            (setf previous-point-position (copy-mark point :right)
-                  (buffer-property buffer 'pane-previous-point-position) previous-point-position))
-          (when (not previous-mark-position)
-            (setf previous-mark-position (copy-mark mark :left)
-                  (buffer-property buffer 'pane-previous-mark-position) previous-mark-position))
-          ;; If the point has moved, then invalidate the line that contained the point and the line that
-          ;; now holds the point.
-          (when (not (mark= point previous-point-position))
-            (flush-display-line previous-point-position)
-            (flush-display-line point))
-          ;; If the mark changes state, flush lines within the region.
-          (when (or (and (not (buffer-mark-active buffer))
-                         (buffer-property buffer 'pane-mark-was-active))
-                    (and (buffer-mark-active buffer)
-                         (not (buffer-property buffer 'pane-mark-was-active))))
-            (flush-display-lines-in-region point mark))
-          ;; If the mark is active and the point moves, flush lines between the old point position
-          ;; and the new position.
-          ;; FIXME: This will cause a bunch of lines to be redrawn when the point & mark are exchanged.
-          (when (and (buffer-mark-active buffer)
-                     (not (mark= point previous-point-position)))
-            (flush-display-lines-in-region point previous-point-position))
-          ;; If the mark is or was active and moves, flush lines between the old mark position
-          ;; and the new position.
-          ;; FIXME: This will cause a bunch of lines to be redrawn when the point & mark are exchanged.
-          (when (and (or (buffer-mark-active buffer)
-                         (buffer-property buffer 'pane-mark-was-active))
-                     (not (mark= mark previous-mark-position)))
-            (flush-display-lines-in-region mark previous-mark-position))
-          ;; Finally, flush any stale lines.
-          (flush-stale-lines)
-          ;; Update tracking properties.
-          (setf (buffer-property buffer 'pane-mark-was-active) (buffer-mark-active buffer))
-          (move-mark-to-mark previous-point-position point)
-          (move-mark-to-mark previous-mark-position mark)
-          ;; Generate WINDOW-ROWS display lines, starting at TOP-LINE.
-          ;; TODO: Don't start from the beginning of the top-line, use the charpos instead.
-          (setf (mark-charpos top-line) 0)
-          (do ((line (mark-line top-line) (next-line line)))
-              ;; Stop when there are no more lines or the screen has been filled up.
-              ((null line))
-            (render-display-line line
-                                 (lambda (display-line)
-                                   (check-pending-input)
-                                   (vector-push display-line new-screen)
-                                   (when (and (eql (mark-line point) (display-line-line display-line))
-                                              (<= (display-line-start display-line) (mark-charpos point))
-                                              (or (and (eql (display-line-end display-line) (line-length (display-line-line display-line)))
-                                                       (eql (display-line-end display-line) (mark-charpos point)))
-                                                  (< (mark-charpos point) (display-line-end display-line))))
-                                     (setf point-line display-line))
-                                   (when (eql (fill-pointer new-screen) (window-rows))
-                                     (return)))))
-          (setf (fill-pointer new-screen) (window-rows))
-          ;; If the point is not within the screen bounds, then recenter and retry.
-          (when (not point-line)
-            (recenter buffer)
-            (return-from redisplay nil))
-          ;; Compare against the current screen, blitting when needed.
-          (if (eql buffer *minibuffer*)
-            (let ((minibuffer-rows (minibuffer-rows)))
-              (do ((y 0 (incf y)))
-                  ((= y minibuffer-rows))
-                (let ((line (aref new-screen y)))
-                  (unless (eql (aref current-screen y) line)
-                    (blit-display-line line (+ y (- (window-rows) minibuffer-rows) 2))
-                    (setf (aref current-screen y) line)
-                    (check-pending-input)))))
-            (progn
-              (dotimes (y (window-rows))
-                (let ((line (aref new-screen y)))
-                  (unless (eql (aref current-screen y) line)
-                    (blit-display-line line y)
-                    (setf (aref current-screen y) line)
-                    (check-pending-input))))
-              ;; render the messages line
-              (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
-                (when line
-                  (render-display-line line
-                    (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
-          (render-mode-line)
-          ;; Prune the cache.
-          (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
-        t)
+	  (mezzano.supervisor::with-mutex ((buffer-lock buffer))
+	    (when (not previous-point-position)
+	      (setf previous-point-position (copy-mark point :right)
+		    (buffer-property buffer 'pane-previous-point-position) previous-point-position))
+	    (when (not previous-mark-position)
+	      (setf previous-mark-position (copy-mark mark :left)
+		    (buffer-property buffer 'pane-previous-mark-position) previous-mark-position))
+	    ;; If the point has moved, then invalidate the line that contained the point and the line that
+	    ;; now holds the point.
+	    (when (not (mark= point previous-point-position))
+	      (flush-display-line previous-point-position)
+	      (flush-display-line point))
+	    ;; If the mark changes state, flush lines within the region.
+	    (when (or (and (not (buffer-mark-active buffer))
+			   (buffer-property buffer 'pane-mark-was-active))
+		      (and (buffer-mark-active buffer)
+			   (not (buffer-property buffer 'pane-mark-was-active))))
+	      (flush-display-lines-in-region point mark))
+	    ;; If the mark is active and the point moves, flush lines between the old point position
+	    ;; and the new position.
+	    ;; FIXME: This will cause a bunch of lines to be redrawn when the point & mark are exchanged.
+	    (when (and (buffer-mark-active buffer)
+		       (not (mark= point previous-point-position)))
+	      (flush-display-lines-in-region point previous-point-position))
+	    ;; If the mark is or was active and moves, flush lines between the old mark position
+	    ;; and the new position.
+	    ;; FIXME: This will cause a bunch of lines to be redrawn when the point & mark are exchanged.
+	    (when (and (or (buffer-mark-active buffer)
+			   (buffer-property buffer 'pane-mark-was-active))
+		       (not (mark= mark previous-mark-position)))
+	      (flush-display-lines-in-region mark previous-mark-position))
+	    ;; Finally, flush any stale lines.
+	    (flush-stale-lines)
+	    ;; Update tracking properties.
+	    (setf (buffer-property buffer 'pane-mark-was-active) (buffer-mark-active buffer))
+	    (move-mark-to-mark previous-point-position point)
+	    (move-mark-to-mark previous-mark-position mark)
+	    ;; Generate WINDOW-ROWS display lines, starting at TOP-LINE.
+	    ;; TODO: Don't start from the beginning of the top-line, use the charpos instead.
+	    (setf (mark-charpos top-line) 0)
+	    (do ((line (mark-line top-line) (next-line line)))
+		;; Stop when there are no more lines or the screen has been filled up.
+		((null line))
+	      (render-display-line line
+				   (lambda (display-line)
+				     (check-pending-input)
+				     (vector-push display-line new-screen)
+				     (when (and (eql (mark-line point) (display-line-line display-line))
+						(<= (display-line-start display-line) (mark-charpos point))
+						(or (and (eql (display-line-end display-line) (line-length (display-line-line display-line)))
+							 (eql (display-line-end display-line) (mark-charpos point)))
+						    (< (mark-charpos point) (display-line-end display-line))))
+				       (setf point-line display-line))
+				     (when (eql (fill-pointer new-screen) (window-rows))
+				       (return)))))
+	    (setf (fill-pointer new-screen) (window-rows))
+	    ;; If the point is not within the screen bounds, then recenter and retry.
+	    (when (not point-line)
+	      (recenter buffer)
+	      (return-from redisplay nil))
+	    ;; Compare against the current screen, blitting when needed.
+	    (if (eql buffer *minibuffer*)
+		(let ((minibuffer-rows (minibuffer-rows)))
+		  (do ((y 0 (incf y)))
+		      ((= y minibuffer-rows))
+		    (let ((line (aref new-screen y)))
+		      (unless (eql (aref current-screen y) line)
+			(blit-display-line line (+ y (- (window-rows) minibuffer-rows) 2))
+			(setf (aref current-screen y) line)
+			(check-pending-input)))))
+		(progn
+		  (dotimes (y (window-rows))
+		    (let ((line (aref new-screen y)))
+		      (unless (eql (aref current-screen y) line)
+			(blit-display-line line y)
+			(setf (aref current-screen y) line)
+			(check-pending-input))))
+		  ;; render the messages line
+		  (let ((line (previous-line (last-line (get-buffer-create "*Messages*")))))
+		    (when line
+		      (render-display-line line
+					   (lambda (l) (blit-display-line l (1+ (window-rows)))))))))
+	    (render-mode-line)
+	    ;; Prune the cache.
+	    (setf (display-line-cache *editor*) (subseq (display-line-cache *editor*) 0 (* (window-rows) 4))))
+	  t))
     (pending-input ()
       nil)))
 

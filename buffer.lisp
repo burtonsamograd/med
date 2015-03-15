@@ -11,12 +11,15 @@
    (%key-map :initarg :key-map :accessor buffer-key-map)
    (%pre-command-hooks :initarg :pre-command-hooks :accessor buffer-pre-command-hooks)
    (%post-command-hooks :initarg :post-command-hooks :accessor buffer-post-command-hooks)
+   (%lock :initarg :lock :reader buffer-lock)
    (%properties))
   (:default-initargs 
      :mark-active nil
      :key-map (make-hash-table)
      :pre-command-hooks '()
-     :post-command-hooks '()))
+     :post-command-hooks '()
+     :lock (mezzano.supervisor::make-mutex "Buffer") ; TODO: Buffer Name Lock
+   ))
 
 (defgeneric buffer-property (buffer property-name &optional default))
 (defgeneric (setf buffer-property) (value buffer property-name &optional default))
@@ -135,10 +138,11 @@ Don't use this directly, use INSERT instead."
 
 (defun insert (buffer string)
   "Insert STRING into BUFFER at point. STRING is a string-designator, so can be a character."
-  (loop for ch across (string string)
-     if (char= ch #\Newline)
-     do (insert-line (buffer-point buffer))
-     else do (insert-char (buffer-point buffer) ch)))
+  (mezzano.supervisor::with-mutex ((buffer-lock buffer))
+    (loop for ch across (string string)
+       if (char= ch #\Newline)
+       do (insert-line (buffer-point buffer))
+       else do (insert-char (buffer-point buffer) ch))))
 
 (defun order-marks (mark-1 mark-2)
   (let ((line-1 (mark-line mark-1))

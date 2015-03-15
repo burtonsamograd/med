@@ -9,7 +9,8 @@
    (insert buffer (format nil "~%~A> " (sys.int::package-shortest-name *package*)))
    (when (buffer-property buffer 'repl-prompt-end)
      (delete-mark (buffer-property buffer 'repl-prompt-end)))
-   (setf (buffer-property buffer 'repl-prompt-end) (copy-mark (buffer-point buffer))))
+   (setf (buffer-property buffer 'repl-prompt-end) (copy-mark (buffer-point buffer)))
+   (force-redisplay))
 
 (defun start-repl ()
   (initialize-repl-key-map)
@@ -47,7 +48,6 @@
       (when (and (> (length code) 0)
                  (not (string= code (car *repl-history*))))
         (push code *repl-history*))
-      (insert buffer #\Newline)
       (setf *repl-history-number* 0))))
 
 (defun repl-clear-output ()
