@@ -94,8 +94,8 @@
                 (set-key #\n 'self-insert-command key-map)
                 (return t))
                ((string-equal line "n")
-                (set-key #\y 'self-insert-command key-map)
-                (set-key #\n 'self-insert-command key-map)
+                (set-key #\y old-y-command key-map)
+                (set-key #\n old-n-command key-map)
                 (return nil)))))))
 
 (defun initialize-minibuffer-key-map (key-map)
