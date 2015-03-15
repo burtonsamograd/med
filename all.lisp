@@ -32,11 +32,11 @@ If the compiled file is out of date, recompile and load it."
 
 (defun make ()
   (let ((start-time (get-universal-time)))
-     (cal "home/med/all.lisp")
+     (cal "all.lisp")
      (format t "Total build time: ~A seconds.~%" (- (get-universal-time) start-time))))
 
 (defun clean ()
-  (dolist (f (directory "home/med/*.llf")) (delete-file f)))
+  (dolist (f (directory "*.llf")) (delete-file f)))
 
 (cal "line.lisp")
 (cal "mark.lisp")
