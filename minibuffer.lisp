@@ -80,23 +80,22 @@
 
 (defun minibuffer-y-or-n-p (&optional control &rest arguments)
   (let* ((prompt (apply 'format nil control arguments))
-         (key-map (buffer-key-map *minibuffer*))
-         (old-y-command (gethash #\y key-map))
-         (old-n-command (gethash #\n key-map)))
+         (key-map (buffer-key-map *minibuffer*)))
     (set-key #\y (lambda () (insert *minibuffer* #\y) 
                             (minibuffer-finish-input-command)) key-map)
     (set-key #\n (lambda () (insert *minibuffer* #\n) 
                             (minibuffer-finish-input-command)) key-map)
-    (loop
-       (let ((line (read-from-minibuffer (format nil "~A (Y or N) " prompt))))
-         (cond ((string-equal line "y")
-                (set-key #\y 'self-insert-command key-map)
-                (set-key #\n 'self-insert-command key-map)
-                (return t))
-               ((string-equal line "n")
-                (set-key #\y old-y-command key-map)
-                (set-key #\n old-n-command key-map)
-                (return nil)))))))
+    (unwind-protect
+      (loop
+         (let ((line (read-from-minibuffer (format nil "~A (Y or N) " prompt))))
+           (set-key #\y 'self-insert-command key-map)
+           (set-key #\n 'self-insert-command key-map)
+           (cond ((string-equal line "y")
+                  (return t))
+                 ((string-equal line "n")
+                  (return nil)))))
+     (set-key #\y 'self-insert-command key-map)
+     (set-key #\n 'self-insert-command key-map))))
 
 (defun initialize-minibuffer-key-map (key-map)
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
@@ -110,3 +109,4 @@
   (set-key '(#\C-X #\b) nil key-map)
   (set-key '(#\C-X #\C-B) nil key-map)
   (set-key #\C-C nil key-map))
+
