@@ -40,12 +40,14 @@
        (let ((file (buffer-string buffer point (buffer-point buffer)))
              (*default-pathname-defaults* (buffer-property buffer 
                                                            'default-pathname-defaults)))      
-         (find-file file)
-         (move-mark (buffer-point buffer))
-         (with-mark (point (buffer-point buffer))
-           (scan-forward (buffer-point buffer) (lambda (c) (char= c #\:)))
-           (let ((lineno (read-from-string 
-                           (buffer-string buffer point (buffer-point buffer)))))
-             (move-beginning-of-buffer (current-buffer *editor*))
-             (dotimes (i (1- lineno))
-               (next-line-command))))))))
+         (let ((file-buffer (find-file file)))
+           (move-mark (buffer-point buffer))
+           (with-mark (point (buffer-point buffer))
+             (scan-forward (buffer-point buffer) (lambda (c) (char= c #\:)))
+             (let ((lineno (read-from-string 
+                             (buffer-string buffer point (buffer-point buffer)))))
+                 (move-beginning-of-buffer file-buffer)
+                 (dotimes (i (1- lineno))
+                   (next-line-command))
+                 (setf (last-buffer *editor*) buffer)
+                 (switch-to-buffer file-buffer))))))))
