@@ -3,6 +3,9 @@
 ;;; Minibuffer stuff.
 (defvar *minibuffer-history* '())
 (defvar *minibuffer-history-number* 0)
+(defvar *minibuffer-completer* nil)
+(defvar *minibuffer-completion-results* ())
+(defvar *minibuffer-completion-results-number* 0)
 
 (defun fix-minibuffer-point-position-hook ()
   (when (mark< (buffer-point *minibuffer*)
@@ -41,7 +44,7 @@
     (decf *minibuffer-history-number*)
     (replace-minibuffer-string (nth *minibuffer-history-number* *minibuffer-history*))))
 
-(defun read-from-minibuffer (prompt &key default)
+(defun read-from-minibuffer (prompt &key default completer)
   "Read a string from the minibuffer."
   (let ((old-buffer (current-buffer *editor*)))
     (when (eql old-buffer *minibuffer*)
@@ -53,6 +56,7 @@
                                 :key-map *minibuffer-key-map*
                                 :post-command-hooks '(fix-minibuffer-point-position-hook)))
            (setf (buffer-property *minibuffer* 'name) "*Minibuffer*")
+           (setf *minibuffer-completer* completer)
            (switch-to-buffer *minibuffer*)
            (insert *minibuffer* prompt)
            (setf (buffer-property *minibuffer* 'minibuffer-prompt-end) 
@@ -66,7 +70,6 @@
                 (setf *minibuffer-history-number* 0)
                 (error e)))))
       (switch-to-buffer old-buffer))))x
-
 
 (defun minibuffer-yes-or-no-p (&optional control &rest arguments)
   (let ((prompt (apply 'format nil control arguments)))
@@ -96,11 +99,36 @@
      (remhash #\y key-map)
      (remhash #\n key-map))))
 
+(defun minibuffer-complete-command ()
+  (when *minibuffer-completer*
+    (if (eql *last-command* 'minibuffer-complete-command)
+      (when (> (length *minibuffer-completion-results*) 0)
+        (delete-region *minibuffer*
+                       (buffer-property *minibuffer* 'minibuffer-prompt-end)
+                       (buffer-point *minibuffer*))
+        (setf *minibuffer-completion-results-number*
+              (mod (1+ *minibuffer-completion-results-number*) 
+                   (length *minibuffer-completion-results*)))
+        (insert *minibuffer*
+                (nth *minibuffer-completion-results-number* 
+                     *minibuffer-completion-results*)))
+      (let* ((text (buffer-string *minibuffer*
+                                  (buffer-property *minibuffer* 'minibuffer-prompt-end)
+                                  (buffer-point *minibuffer*)))
+             (results (funcall *minibuffer-completer* text)))
+        (delete-region *minibuffer*
+                       (buffer-property *minibuffer* 'minibuffer-prompt-end)
+                       (buffer-point *minibuffer*))
+        (insert *minibuffer* (car results))
+        (setf *minibuffer-completion-results* results)
+        (setf *minibuffer-completion-results-number* 0)))))
+
 (defun initialize-minibuffer-key-map (key-map)
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
   (set-key #\C-M 'minibuffer-finish-input-command key-map)
   (set-key #\M-P 'minibuffer-previous-history-command key-map)
   (set-key #\M-N 'minibuffer-next-history-command key-map)
+  (set-key #\Tab 'minibuffer-complete-command key-map)
   (set-key '(#\C-X #\C-F) nil key-map)
   (set-key '(#\C-X #\C-S) nil key-map)
   (set-key '(#\C-X #\C-W) nil key-map)
