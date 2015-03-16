@@ -254,10 +254,18 @@
       (insert buffer #\Newline))
     (setf (buffer-modified buffer) nil)))
 
+(defun buffer-completer (text)
+  (let (results)
+    (push text results)
+    (dolist (buffer *buffer-list*)
+      (when (search text (buffer-property buffer 'name))
+        (push (buffer-property buffer 'name) results)))
+    results))
+
 (defun switch-to-buffer-command ()
   (let* ((default-buffer (or (last-buffer *editor*)
                              (current-buffer *editor*)))
-         (name (string-trim " " (read-from-minibuffer (format nil "Buffer (default ~A): " (buffer-property default-buffer 'name)))))
+         (name (string-trim " " (read-from-minibuffer (format nil "Buffer (default ~A): " (buffer-property default-buffer 'name)) :completer #'buffer-completer)))
          (other-buffer (if (zerop (length name))
                            default-buffer
                            (get-buffer-create name))))
