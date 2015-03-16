@@ -173,9 +173,9 @@
 
 (defun find-file-command ()
   (find-file (read-from-minibuffer "Find file: " 
-                                   (namestring 
-                                     (or (buffer-property (current-buffer *editor*)                                                                  'default-pathname-defaults)
-                                         *default-pathname-defaults*)))))
+                                   :default (namestring 
+                                              (or (buffer-property (current-buffer *editor*)                                                                  'default-pathname-defaults)
+                                                   *default-pathname-defaults*)))))
 
 ;; TODO: factor out the buffer saving from the below 3 functions into defun save-buffer
 
@@ -183,7 +183,7 @@
   (let ((buffer (current-buffer *editor*)))
     (when (not (buffer-property buffer 'path))
       (let* ((path (read-from-minibuffer (format nil "Write file (default ~S): " 
-                                                 (buffer-property buffer 'default-pathname-defaults))))
+                                                 :default (buffer-property buffer 'default-pathname-defaults))))
              (filespec (merge-pathnames path)))
         (rename-buffer buffer (file-namestring filespec))
         (setf (buffer-property buffer 'path) filespec)))
@@ -225,7 +225,7 @@
                                           (buffer-property buffer 'default-pathname-defaults)
                                           *default-pathname-defaults*))
          (path (read-from-minibuffer "Write file: " 
-                                     (namestring *default-pathname-defaults*)))
+                                     :default (namestring *default-pathname-defaults*)))
          (filespec (merge-pathnames path)))
     (rename-buffer buffer (file-namestring filespec))
     (setf (buffer-property buffer 'path) filespec)
@@ -493,9 +493,9 @@ If no such form is found, then return the CL-USER package."
 (defun cd-command ()
   (let* ((buffer (current-buffer *editor*))
          (dir (read-from-minibuffer "Directory: " 
-                                    (namestring 
-                                      (buffer-property buffer 
-                                                       'default-pathname-defaults)))))
+                                    :default (namestring 
+                                               (buffer-property buffer 
+                                                               'default-pathname-defaults)))))
     (setf (buffer-property buffer 'default-pathname-defaults) (pathname dir))))
 
 (defun compile-buffer-command ()

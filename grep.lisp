@@ -12,7 +12,7 @@
                                             'default-pathname-defaults
                                             *default-pathname-defaults*))
          (filespec (read-from-minibuffer "File(s): " 
-                                        (namestring default-pathname-defaults)))
+                                        :default (namestring default-pathname-defaults)))
          (files (directory filespec)))
     (setf (buffer-property buffer 'default-pathname-defaults) default-pathname-defaults)
     (setf (buffer-key-map buffer) *grep-key-map*)

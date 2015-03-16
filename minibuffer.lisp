@@ -41,7 +41,7 @@
     (decf *minibuffer-history-number*)
     (replace-minibuffer-string (nth *minibuffer-history-number* *minibuffer-history*))))
 
-(defun read-from-minibuffer (prompt &optional default-text)
+(defun read-from-minibuffer (prompt &key default)
   "Read a string from the minibuffer."
   (let ((old-buffer (current-buffer *editor*)))
     (when (eql old-buffer *minibuffer*)
@@ -58,8 +58,7 @@
            (setf (buffer-property *minibuffer* 'minibuffer-prompt-end) 
                                   (copy-mark (buffer-point *minibuffer*) :left))
 
-           (when default-text
-             (insert *minibuffer* default-text))
+           (when default (insert *minibuffer* default))
            (catch 'minibuffer-result
              (handler-case
               (editor-loop)

@@ -194,7 +194,7 @@ Don't use this directly, use INSERT instead."
            ;; todo properly...
            (do ((m1 (copy-mark mark-1))
                 (m2 (copy-mark mark-2)))
-               ((mark= m1 m2))
+               ((mark>= m1 m2)) ; make sure we terminate
              (if (end-of-line-p m1)
                  (insert-line point)
                  (insert-char point (line-character (mark-line m1) (mark-charpos m1))))
