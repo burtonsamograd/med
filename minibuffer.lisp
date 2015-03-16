@@ -88,14 +88,14 @@
     (unwind-protect
       (loop
          (let ((line (read-from-minibuffer (format nil "~A (Y or N) " prompt))))
-           (set-key #\y 'self-insert-command key-map)
-           (set-key #\n 'self-insert-command key-map)
+           (remhash #\y key-map)
+           (remhash #\n key-map)
            (cond ((string-equal line "y")
                   (return t))
                  ((string-equal line "n")
                   (return nil)))))
-     (set-key #\y 'self-insert-command key-map)
-     (set-key #\n 'self-insert-command key-map))))
+     (remhash #\y key-map)
+     (remhash #\n key-map))))
 
 (defun initialize-minibuffer-key-map (key-map)
   (set-key #\Newline 'minibuffer-finish-input-command key-map)
