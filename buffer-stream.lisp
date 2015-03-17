@@ -21,7 +21,7 @@
     (when (char= #\Newline char)
       (force-redisplay))))
 
-(defmethod sys.gray::stream-read-char ((stream buffer-input-stream))
+(defmethod sys.gray::stream-read-char ((stream buffer-stream))
   (loop
   (let* ((buffer (buffer-stream-buffer stream))
          (point (buffer-point buffer))
@@ -36,7 +36,7 @@
    (mezzano.supervisor::fifo-push (mezzano.supervisor::fifo-pop (fifo *editor*))
                                   (fifo *editor*))))
 
-(defmethod sys.gray::stream-unread-char ((stream buffer-input-stream) char)
+(defmethod sys.gray::stream-unread-char ((stream buffer-stream) char)
   (let ((buffer (buffer-stream-buffer stream)))
     (save-excursion (buffer)
       (move-end-of-buffer buffer)
