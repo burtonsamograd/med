@@ -3,14 +3,7 @@
 (defvar *repl-key-map*)
 (defvar *repl-history* '())
 (defvar *repl-history-number* 0)
-
-(defun repl-prompt (buffer)
-   (move-end-of-buffer buffer)
-   (insert buffer (format nil "~%~A> " (sys.int::package-shortest-name *package*)))
-   (when (buffer-property buffer 'repl-prompt-end)
-     (delete-mark (buffer-property buffer 'repl-prompt-end)))
-   (setf (buffer-property buffer 'repl-prompt-end) (copy-mark (buffer-point buffer)))
-   (force-redisplay))
+(defvar *repl-buffer-stream* nil)
 
 (defun start-repl ()
   (initialize-repl-key-map)
@@ -23,15 +16,24 @@
               (or (buffer-property (current-buffer *editor*) 'default-pathname-defaults)
                   *default-pathname-defaults*)
             (last-buffer *editor*) (current-buffer *editor*))
-      (repl-prompt buffer)
+      (insert buffer (format nil "~%~A> " (sys.int::package-shortest-name *package*)))
+      (setf (buffer-property buffer 'input-start) (copy-mark (buffer-point buffer)))
+      (setf *repl-buffer-stream* (make-instance 'buffer-stream
+                                                :buffer buffer
+                                                :filter #'repl-buffer-filter))
       (push buffer (buffer-list)))
   (setf (last-buffer *editor*) (current-buffer *editor*))
   (switch-to-buffer buffer)))
 
+(defun repl-buffer-filter (buffer c)
+  (when (char= c #\>)
+    (setf (buffer-property buffer 'repl-prompt-end) (copy-mark (buffer-point buffer)))))
+
 (defun repl-eval (code)
   (if (string= code "")
        ""
-       (let* ((s (make-instance 'buffer-stream :buffer (get-buffer "*repl*")))
+       (let* ((s *repl-buffer-stream*)
+              (*standard-input* (make-instance 'buffer-input-stream :buffer (get-buffer "*repl*")))
               (*standard-output* s)
               (*error-output* s)
               (*default-pathname-defaults* (buffer-property (get-buffer "*repl*")
@@ -39,7 +41,9 @@
          (handler-case
              (format t "~S" (eval (read-from-string code)))
              (error (e) (format t "~S~%" e) ""))
-            (finish-output))))
+            (format t "~%~A> " (sys.int::package-shortest-name *package*))
+            (finish-output)
+            (force-redisplay))))
 
 (defun repl-finish-input-command ()
   (let ((buffer (current-buffer *editor*)))
@@ -48,15 +52,15 @@
     ;; FIXME: clearing the buffer by cutting the text causes the 
     ;; editor to crash when you hit enter
     (let ((code (buffer-string buffer
-                               (buffer-property buffer 'repl-prompt-end)
+                               (buffer-property buffer 'input-start)
                                (buffer-point buffer))))
       (when (and (> (length code) 0)
                  (not (string= code (car *repl-history*))))
         (push code *repl-history*))
       (insert buffer #\Newline)
+      (setf (buffer-property buffer 'input-start) (copy-mark (buffer-point buffer)))
       (mezzano.supervisor::make-thread (lambda () 
-                                         (repl-eval code)
-                                         (repl-prompt buffer))
+                                         (repl-eval code))
                                        :name "repl"
                                        :initial-bindings `((*editor* ,*editor*)))
       (setf *repl-history-number* 0))))
@@ -73,7 +77,7 @@
   (let ((buffer (current-buffer *editor*)))
     (move-end-of-buffer buffer)
     (delete-region buffer
-                   (buffer-property buffer 'repl-prompt-end) 
+                   (buffer-property buffer 'input-start) 
                    (buffer-point buffer))))
 
 (defun repl-previous-history ()
@@ -90,7 +94,8 @@
 
 (defun repl-beginning-of-line ()
   (let ((buffer (current-buffer *editor*)))
-    (move-mark-to-mark (buffer-point buffer) (buffer-property buffer 'repl-prompt-end))))
+    (move-mark-to-mark (buffer-point buffer) (buffer-property buffer 'repl-prompt-end))
+    (move-mark (buffer-point buffer))))
 
 (defvar *repl-complete-results* ())
 (defvar *repl-complete-results-number* 0)
