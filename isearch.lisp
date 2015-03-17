@@ -1,5 +1,25 @@
 (in-package :med)
 
+(defun search-forward (buffer string)
+  "From point, search forwards for string in buffer."
+  (with-mark (point (buffer-point buffer))
+    ;; Search to the end of the buffer
+    (save-excursion (buffer)
+       (move-end-of-buffer buffer)
+        (setf pos (search string (buffer-string buffer point
+                                                (buffer-point buffer)))))
+    (if pos
+       ;; Found the string, go there
+       (move-char buffer (+ pos (length string)))
+       ;; Didn't find it, wrap around and search from the beginning
+       (progn
+         (save-excursion (buffer)
+           (move-beginning-of-buffer buffer)
+           (setf pos (search string (buffer-string buffer (buffer-point buffer) point))))
+         (when pos
+           (move-beginning-of-buffer buffer)
+           (move-char buffer (+ pos (length string))))))))
+
 (defun cancel-isearch ()
   (format t "~%Cancelling isearch.~%")
   (let ((buffer (current-buffer *editor*)))

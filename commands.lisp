@@ -67,6 +67,10 @@
   (let ((buffer (current-buffer *editor*)))
     (kill-region buffer (buffer-point buffer) (buffer-mark buffer))))
 
+(defun copy-region-command ()
+  (let ((buffer (current-buffer *editor*)))
+    (copy-region buffer (buffer-point buffer) (buffer-mark buffer))))
+
 (defun kill-sexp-command ()
   (let* ((buffer (current-buffer *editor*))
          (point (buffer-point buffer)))
@@ -229,39 +233,13 @@ A top-level form is designated by an open parenthesis at the start of a line."
       (move-sexp buffer -1)
       (buffer-string buffer point (buffer-point buffer)))))
 
-(defun search-forward (buffer string)
-  "From point, search forwards for string in buffer."
-  (with-mark (point (buffer-point buffer))
-    ;; Search to the end of the buffer
-    (save-excursion (buffer)
-       (move-end-of-buffer buffer)
-        (setf pos (search string (buffer-string buffer point
-                                                (buffer-point buffer)))))
-    (if pos
-       ;; Found the string, go there
-       (move-char buffer (+ pos (length string)))
-       ;; Didn't find it, wrap around and search from the beginning
-       (progn
-         (save-excursion (buffer)
-           (move-beginning-of-buffer buffer)
-           (setf pos (search string (buffer-string buffer (buffer-point buffer) point))))
-         (when pos
-           (move-beginning-of-buffer buffer)
-           (move-char buffer (+ pos (length string))))))))
-
 (defun newline-command ()
-  (insert (current-buffer *editor*)  "
-"))
+  (insert (current-buffer *editor*) #\Newline))
 
 (defun open-line-command ()
   (let ((buffer (current-buffer *editor*)))
     (move-end-of-line buffer)
     (newline-command)))
-
-
-(defun copy-region-command ()
-  (let ((buffer (current-buffer *editor*)))
-    (copy-region buffer (buffer-point buffer) (buffer-mark buffer))))
 
 (defun eval-last-sexp-command ()
    (let* ((buffer (current-buffer *editor*)))
