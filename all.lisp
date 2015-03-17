@@ -60,6 +60,7 @@
 (cal "redisplay.lisp")
 (cal "commands.lisp")
 (cal "file.lisp")
+(cal "eval.lisp")
 (cal "keybindings.lisp")
 (cal "repl.lisp")
 (cal "grep.lisp")
