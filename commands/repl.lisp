@@ -24,7 +24,7 @@
     (move-mark-to-mark (buffer-property buffer 'repl-prompt-end) (buffer-point buffer))
     (push buffer (buffer-list))
     (setf (last-buffer *editor*) (current-buffer *editor*))
-    (switch-to-buffer buffer)))))
+    (switch-to-buffer buffer)))
 
 (defun repl-buffer-filter (buffer c)
   (when (char= c #\>)
