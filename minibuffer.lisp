@@ -68,6 +68,9 @@
               (editor-loop)
               (error (e) 
                 (setf *minibuffer-history-number* 0)
+                (setf *minibuffer-completer* nil)
+                (setf *minibuffer-completion-number* 0)
+                (setf *minibuffer-completion-results* nil)
                 (error e)))))
       (switch-to-buffer old-buffer))))x
 
@@ -116,10 +119,11 @@
                                   (buffer-property *minibuffer* 'minibuffer-prompt-end)
                                   (buffer-point *minibuffer*)))
              (results (funcall *minibuffer-completer* text)))
-        (delete-region *minibuffer*
-                       (buffer-property *minibuffer* 'minibuffer-prompt-end)
-                       (buffer-point *minibuffer*))
-        (insert *minibuffer* (car results))
+        (when results
+          (delete-region *minibuffer*
+                         (buffer-property *minibuffer* 'minibuffer-prompt-end)
+                         (buffer-point *minibuffer*))
+          (insert *minibuffer* (car results)))
         (setf *minibuffer-completion-results* results)
         (setf *minibuffer-completion-results-number* 0)))))
 
