@@ -49,23 +49,26 @@
 (defun clean ()
   (dolist (f (directory "*.llf")) (delete-file f)))
 
-(cal "line.lisp")
-(cal "mark.lisp")
-(cal "editor.lisp")
-(cal "save-excursion.lisp")
-(cal "buffer.lisp")
-(cal "buffer-stream.lisp")
-(cal "point.lisp")
-(cal "minibuffer.lisp")
-(cal "redisplay.lisp")
-(cal "commands.lisp")
-(cal "file.lisp")
-(cal "eval.lisp")
-(cal "keybindings.lisp")
-(cal "repl.lisp")
-(cal "grep.lisp")
-(cal "find-definition.lisp")
-(cal "isearch.lisp")
-(cal "main.lisp")
+(let ((files '(
+"line.lisp"
+"mark.lisp"
+"editor.lisp"
+"save-excursion.lisp"
+"buffer.lisp"
+"buffer-stream.lisp"
+"point.lisp"
+"minibuffer.lisp"
+"redisplay.lisp"
+"keybindings.lisp"
+"main.lisp"
+"commands/commands.lisp"
+"commands/file.lisp"
+"commands/eval.lisp"
+"commands/repl.lisp"
+"commands/grep.lisp"
+"commands/find-definition.lisp"
+"commands/isearch.lisp"
+)))
+  (mapc #'cal files))
 
 
