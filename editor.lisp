@@ -39,8 +39,6 @@
 (defvar *this-character*)
 (defvar *last-chord*)
 (defvar *this-chord*)
-(defvar *minibuffer*)
-(defvar *minibuffer-key-map*)
 (defvar *isearch-string* (make-array 0 :element-type 'character :adjustable t :fill-pointer t))
 (defvar *last-isearch-string* *isearch-string*)
 (defvar *buffer-list* '())

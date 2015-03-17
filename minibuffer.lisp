@@ -1,6 +1,7 @@
 (in-package :med)
 
-;;; Minibuffer stuff.
+(defvar *minibuffer* (make-instance 'buffer))
+(defvar *minibuffer-key-map* (make-hash-table))
 (defvar *minibuffer-history* '())
 (defvar *minibuffer-history-number* 0)
 (defvar *minibuffer-completer* nil)
@@ -46,6 +47,7 @@
 
 (defun read-from-minibuffer (prompt &key default completer)
   "Read a string from the minibuffer."
+  (initialize-minibuffer-key-map *minibuffer-key-map*)
   (let ((old-buffer (current-buffer *editor*)))
     (when (eql old-buffer *minibuffer*)
       (error "Recursive minibuffer read!"))

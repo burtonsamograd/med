@@ -52,3 +52,11 @@ If no such form is found, then return the CL-USER package."
 (defun eval-expression-command ()
   (format t "~A~%" (eval (read-from-string (read-from-minibuffer "Eval: ")))))
 
+(defun eval-last-sexp-command ()
+   (let* ((buffer (current-buffer *editor*)))
+     (with-mark (point (buffer-point buffer))
+       (save-excursion (buffer)
+         (move-sexp buffer -1)
+         (let ((string (buffer-string buffer point (buffer-point buffer))))
+           (print (eval (read-from-string string))))))))
+
