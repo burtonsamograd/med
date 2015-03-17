@@ -10,17 +10,16 @@
 (defmethod sys.gray::stream-write-char ((stream buffer-stream) char)
   (let ((buffer (buffer-stream-buffer stream))
         (filter (buffer-stream-filter stream)))
-    (save-excursion (buffer)
-      (move-end-of-buffer buffer)
-      (insert buffer char)
-      (let ((input-start (buffer-property buffer 'input-start)))
-        (if input-start
+    (move-end-of-buffer buffer)
+    (insert buffer char)
+    (let ((input-start (buffer-property buffer 'input-start)))
+      (if input-start
           (move-mark-to-mark (buffer-property buffer 'input-start) (buffer-point buffer))
           (setf (buffer-property buffer 'input-start) (copy-mark (buffer-point buffer)))))
     (when filter
       (funcall filter buffer char))
-    (when (or (char= char #\Newline) (char= char #\Space)
-      (force-redisplay))))))
+    (when (or (char= char #\Newline) (char= char #\Space))
+      (force-redisplay))))
 
 (defmethod sys.gray::stream-read-char-no-hang ((stream buffer-stream))
   (let* ((buffer (buffer-stream-buffer stream))
