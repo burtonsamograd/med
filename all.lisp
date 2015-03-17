@@ -39,7 +39,9 @@
              (invoke-restart it)))))
      (cal-1 file force-load)))
 
-(defun make ()
+(defun make (&optional force-load)
+  (when force-load 
+    (setf *loaded-files* nil))
   (let ((start-time (get-universal-time)))
      (cal "all.lisp" t)
      (format t "Total build time: ~A seconds.~%" (- (get-universal-time) start-time))))
@@ -57,6 +59,7 @@
 (cal "minibuffer.lisp")
 (cal "redisplay.lisp")
 (cal "commands.lisp")
+(cal "file.lisp")
 (cal "keybindings.lisp")
 (cal "repl.lisp")
 (cal "grep.lisp")
