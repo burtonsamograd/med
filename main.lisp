@@ -101,6 +101,7 @@
         (setf *editors* (remove *editor* *editors*)))))))))
 
 (defvar *messages* (make-instance 'buffer))
+
 (defun spawn (&key width height initial-file)
   (pushnew *messages* (buffer-list))
   (setf (buffer-property *messages* 'name) "*Messages*")
