@@ -47,8 +47,8 @@
            (progn
              (setf (buffer-key-map buffer) (make-hash-table))
              (handler-case
-                 (format t "~%~S" (eval (read-from-string code)))
-                 (error (e) (format t "~%~S~%" e) "")))
+                 (format t "~S" (eval (read-from-string code)))
+                 (error (e) (format t "~S~%" e) "")))
            (format t "~%~A> " (sys.int::package-shortest-name *package*))
            (finish-output)
            (force-redisplay))
@@ -65,6 +65,7 @@
       (when (and (> (length code) 0)
                  (not (string= code (car *repl-history*))))
         (push code *repl-history*))
+      (format *repl-buffer-stream* "~%")
       (mezzano.supervisor::make-thread (lambda () 
                                          (repl-eval code))
                                        :name "repl"
